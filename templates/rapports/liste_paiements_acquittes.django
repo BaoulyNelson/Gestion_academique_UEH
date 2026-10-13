@@ -1,0 +1,85 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Etudiants ayant acquitte les frais | GP7{% endblock %}
+{% block contenu %}
+    <style>
+        @media print {
+            .barre-laterale, .entete-page, .bienvenue, .filtres-liste, .actions-impression { display: none !important; }
+            .contenu-principal { margin: 0; padding: 0; background: #fff; }
+        }
+    </style>
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Registrariat</p>
+                    <h1>Frais de scolarite acquittes</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            {% include "partials/bienvenue.django" with bienvenue_surtitre="REGISTRARIAT" bienvenue_titre="Suivi des frais par programme" bienvenue_description="Retrouvez les etudiants ayant integralement regle les frais pour un programme et une periode." %}
+            <section class="section-tableau filtres-liste section-apres">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">PERIMETRE</p>
+                        <h2>Filtrer les paiements</h2>
+                    </div>
+                </div>
+                <form method="get" class="formulaire-connexion grille-filtres-liste">
+                    {% if user.is_superuser %}<label for="{{ formulaire.entite.id_for_label }}">{{ formulaire.entite.label }}{{ formulaire.entite }}</label>{% else %}{{ formulaire.entite }}{% endif %}
+                    <label for="{{ formulaire.programme.id_for_label }}">{{ formulaire.programme.label }}{{ formulaire.programme }}</label>
+                    <label for="{{ formulaire.periode.id_for_label }}">{{ formulaire.periode.label }}{{ formulaire.periode }}</label>
+                    <button class="bouton-principal" type="submit">Afficher <span aria-hidden="true">→</span></button>
+                </form>
+                {% if formulaire.errors %}<div class="alerte" role="alert">{{ formulaire.errors }}</div>{% endif %}
+            </section>
+            {% if paiements %}
+                <section class="section-tableau liste-impression section-apres">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">{{ entite.nom }}</p>
+                            <h2>Etudiants ayant integralement paye</h2>
+                            <p class="texte-secondaire">{% if formulaire.cleaned_data.programme %}{{ formulaire.cleaned_data.programme.nom }}{% endif %}{% if formulaire.cleaned_data.periode %} · {{ formulaire.cleaned_data.periode.nom }} · {{ formulaire.cleaned_data.periode.annee_academique }}{% endif %}</p>
+                        </div>
+                        <div class="actions-impression">
+                            <button class="bouton-principal"
+                                    type="button"
+                                    onclick="window.print()">Imprimer la liste <span aria-hidden="true">→</span></button>
+                        </div>
+                    </div>
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Code etudiant</th>
+                                    <th>Nom</th>
+                                    <th>Programme</th>
+                                    <th>Periode</th>
+                                    <th>Versements</th>
+                                    <th>Total confirme</th>
+                                    <th>Tarif</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for paiement in paiements %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td><strong>{{ paiement.etudiant__profil_etudiant__code_etudiant|default:paiement.etudiant__username }}</strong></td>
+                                        <td>{{ paiement.etudiant__first_name }} {{ paiement.etudiant__last_name }}</td>
+                                        <td>{{ paiement.tarif__programme__nom }}</td>
+                                        <td>{{ paiement.tarif__periode__nom }} · {{ paiement.tarif__periode__annee_academique }}</td>
+                                        <td>{{ paiement.nombre_versements }}</td>
+                                        <td>{{ paiement.total_confirme }} {{ paiement.tarif__devise }}</td>
+                                        <td>{{ paiement.tarif__montant }} {{ paiement.tarif__devise }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            {% else %}
+                <section class="message-role" role="status"><strong>{% if entite %}Aucun paiement integral valide ne correspond aux filtres.{% else %}Choisissez une entite pour afficher la liste.{% endif %}</strong></section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

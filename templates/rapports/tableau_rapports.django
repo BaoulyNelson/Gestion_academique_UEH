@@ -1,0 +1,259 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Rapports academiques | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Analyse</p>
+                    <h1>Rapports academiques</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            <section class="bienvenue">
+                <div>
+                    <p class="surtitre">INDICATEURS REGISTRARIAT</p>
+                    <h2>Vue statistique</h2>
+                    <p>Les donnees sont limitees a votre entite; choisissez une periode ou un programme pour affiner le rapport.</p>
+                </div>
+                <div class="bienvenue-marque" aria-hidden="true"><span>UEH</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span></div>
+            </section>
+            <section class="section-tableau" style="margin-top: 18px;">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">PERIMETRE</p>
+                        <h2>Filtres du rapport</h2>
+                    </div>
+                </div>
+                <form method="get"
+                      class="formulaire-connexion"
+                      style="display: grid;
+                             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                             align-items: end;
+                             gap: 12px;
+                             padding: 18px;
+                             margin: 0">
+                    {% if user.is_superuser %}<label for="{{ formulaire.entite.id_for_label }}">{{ formulaire.entite.label }}{{ formulaire.entite }}</label>{% else %}{{ formulaire.entite }}{% endif %}
+                    <label for="{{ formulaire.periode.id_for_label }}">{{ formulaire.periode.label }}{{ formulaire.periode }}</label>
+                    <label for="{{ formulaire.programme.id_for_label }}">{{ formulaire.programme.label }}{{ formulaire.programme }}</label>
+                    <button class="bouton-principal" type="submit">Actualiser <span aria-hidden="true">→</span></button>
+                </form>
+                {% if formulaire.errors %}<div class="alerte" role="alert">{{ formulaire.errors }}</div>{% endif %}
+            </section>
+            {% if indicateurs %}
+                <section class="indicateurs" aria-label="Indicateurs de l'entite">
+                    <article class="indicateur"><span class="indicateur-libelle">Etudiants</span><strong>{{ indicateurs.nombre_etudiants }}</strong><span class="indicateur-detail">selon le perimetre choisi</span></article>
+                    <article class="indicateur indicateur-accent"><span class="indicateur-libelle">Inscriptions validees</span><strong>{{ indicateurs.nombre_inscriptions_validees }}</strong><span class="indicateur-detail">sur {{ indicateurs.nombre_inscriptions }} demandes</span></article>
+                    <article class="indicateur"><span class="indicateur-libelle">Diplomes</span><strong>{{ indicateurs.nombre_diplomes }}</strong><span class="indicateur-detail">actes non annules</span></article>
+                    <article class="indicateur indicateur-alerte"><span class="indicateur-libelle">Memoires soutenus</span><strong>{{ indicateurs.nombre_soutenances }}</strong><span class="indicateur-detail">soutenances enregistrees</span></article>
+                </section>
+                <div class="grille-contenu">
+                    <section class="section-tableau">
+                        <div class="section-entete">
+                            <div>
+                                <p class="surtitre">DOSSIERS D'ETUDES</p>
+                                <h2>Etat des dossiers</h2>
+                            </div>
+                        </div>
+                        <div class="tableau-defilement">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Statut</th>
+                                        <th>Nombre</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>En cours</td>
+                                        <td>{{ indicateurs.dossiers_en_cours }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fermes</td>
+                                        <td>{{ indicateurs.dossiers_fermes }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Abandons</td>
+                                        <td>{{ indicateurs.abandons }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Total</td>
+                                        <td>{{ indicateurs.nombre_dossiers }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    <section class="section-tableau">
+                        <div class="section-entete">
+                            <div>
+                                <p class="surtitre">PROFILS RENSEIGNES</p>
+                                <h2>Repartition par sexe</h2>
+                            </div>
+                        </div>
+                        <div class="tableau-defilement">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Categorie</th>
+                                        <th>Nombre</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ligne in indicateurs.repartition_sexe %}<tr><td>{{ ligne.sexe_display }}</td><td>{{ ligne.nombre }}</td></tr>{% endfor %}
+                                    <tr>
+                                        <td>Profil ou sexe non renseigne</td>
+                                        <td>{{ indicateurs.nombre_sexe_non_renseigne }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Profils renseignes</td>
+                                        <td>{{ indicateurs.nombre_profils_renseignes }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+                <div class="grille-contenu" style="margin-top: 18px;">
+                    <section class="section-tableau">
+                        <div class="section-entete">
+                            <div>
+                                <p class="surtitre">DOSSIERS D'ETUDES</p>
+                                <h2>Statut par sexe</h2>
+                            </div>
+                        </div>
+                        <div class="tableau-defilement">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Statut</th>
+                                        <th>Sexe</th>
+                                        <th>Nombre</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ligne in indicateurs.repartition_dossiers_sexe %}<tr><td>{{ ligne.statut_display }}</td><td>{{ ligne.sexe_display }}</td><td>{{ ligne.nombre }}</td></tr>{% empty %}<tr><td colspan="3">Aucun dossier dans ce perimetre.</td></tr>{% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    <section class="section-tableau">
+                        <div class="section-entete">
+                            <div>
+                                <p class="surtitre">ACTES ACADEMIQUES</p>
+                                <h2>Documents par sexe</h2>
+                            </div>
+                        </div>
+                        <div class="tableau-defilement">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Type d'acte</th>
+                                        <th>Sexe</th>
+                                        <th>Nombre</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ligne in indicateurs.repartition_actes_sexe %}<tr><td>{{ ligne.type_acte_display }}</td><td>{{ ligne.sexe_display }}</td><td>{{ ligne.nombre }}</td></tr>{% empty %}<tr><td colspan="3">Aucun acte dans ce perimetre.</td></tr>{% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                    <section class="section-tableau">
+                        <div class="section-entete">
+                            <div>
+                                <p class="surtitre">MEMOIRES</p>
+                                <h2>Soutenances par sexe</h2>
+                            </div>
+                        </div>
+                        <div class="tableau-defilement">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Sexe</th>
+                                        <th>Nombre</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for ligne in indicateurs.repartition_soutenances_sexe %}<tr><td>{{ ligne.sexe_display }}</td><td>{{ ligne.nombre }}</td></tr>{% empty %}<tr><td colspan="2">Aucune soutenance dans ce perimetre.</td></tr>{% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+                <section class="section-tableau" style="margin-top: 18px;">
+                    <div class="section-entete"><div><p class="surtitre">ACTES ACADEMIQUES</p><h2>Documents delivres</h2></div><a class="bouton-secondaire"
+   href="{% url 'rapports:exporter_csv' %}?{{ request.GET.urlencode }}">Exporter CSV</a></div>
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Type de document</th>
+                                    <th>Nombre</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Actes non annules</td>
+                                    <td>{{ indicateurs.nombre_actes }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Attestations et certificats</td>
+                                    <td>{{ indicateurs.nombre_attestations_certificats }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Diplomes</td>
+                                    <td>{{ indicateurs.nombre_diplomes }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <section class="section-tableau" style="margin-top: 18px;">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">RESULTATS PUBLIES</p>
+                            <h2>Reussites, reprises et echecs par cours</h2>
+                        </div>
+                    </div>
+                    {% if statistiques_cours %}
+                        <div class="tableau-defilement">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Cours</th>
+                                        <th>Periode</th>
+                                        <th>Version du reglement</th>
+                                        <th>Seuil de reussite</th>
+                                        <th>Seuil de reprise</th>
+                                        <th>Etudiants evalues</th>
+                                        <th>Reussites</th>
+                                        <th>Reprises</th>
+                                        <th>Echecs</th>
+                                        <th>Repartition par sexe</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for resultat in statistiques_cours %}<tr><td><strong>{{ resultat.cours.code }}</strong> · {{ resultat.cours.nom }}</td><td>{{ resultat.periode.nom }} · {{ resultat.periode.annee_academique }}</td><td>{{ resultat.version_regle|default:"-" }}</td>{% if resultat.seuil_reussite == None %}<td colspan="6"><span class="badge-statut">Non configure: renseignez seuil_reussite_cours dans le reglement effectif.</span></td>{% else %}<td>{{ resultat.seuil_reussite }}/100</td><td>{{ resultat.seuil_reprise }}/100</td><td>{{ resultat.nombre_etudiants }}</td><td>{{ resultat.reussites }}</td><td>{{ resultat.reprises }}</td><td>{{ resultat.echecs }}</td>{% endif %}<td>{% if resultat.repartition_sexe %}{% for ligne in resultat.repartition_sexe %}{{ ligne.sexe_display }}: {{ ligne.reussites }} / {{ ligne.reprises }} / {{ ligne.echecs }}{% if not forloop.last %}<br>{% endif %}{% endfor %}{% else %}-{% endif %}</td></tr>{% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="etat-vide">
+                            <span class="etat-vide-symbole" aria-hidden="true">→</span>
+                            <div>
+                                <strong>Aucun resultat publie dans ce perimetre</strong>
+                                <p>Les statistiques apparaitront apres publication des notes.</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </section>
+            {% else %}
+                <section class="message-role" role="status">
+                    <strong>Choisissez une entite pour afficher les indicateurs.</strong>
+                    <p>Les statistiques ne sont calculees que dans le perimetre autorise de votre compte.</p>
+                </section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

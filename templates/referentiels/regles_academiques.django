@@ -1,0 +1,88 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Constantes academiques | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Referentiels</p>
+                    <h1>Constantes academiques</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            {% include "partials/bienvenue.django" with bienvenue_surtitre="REFERENTIELS" bienvenue_titre="Regles par entite" bienvenue_description="Versionnez les seuils et parametres academiques applicables a votre entite." %}
+            {% for message in messages %}<div class="alerte" role="status">{{ message }}</div>{% endfor %}
+            <section class="section-tableau section-apres">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">{% if regle_modifiee %}MISE A JOUR{% else %}NOUVELLE VERSION{% endif %}</p>
+                        <h2>{% if regle_modifiee %}Modifier une version{% else %}Configurer les constantes{% endif %}</h2>
+                    </div>
+                    {% if regle_modifiee %}<a class="bouton-secondaire"
+   href="{% url 'referentiels:regles_academiques' %}">Annuler</a>{% endif %}
+                </div>
+                <form method="post"
+                      class="formulaire-connexion formulaire-regles-academiques">
+                    {% csrf_token %}
+                    {{ formulaire.non_field_errors }}
+                    {% for champ in formulaire %}
+                        <label for="{{ champ.id_for_label }}">{{ champ.label }}</label>
+                        {{ champ }}
+                        {% if champ.help_text %}<p class="texte-secondaire">{{ champ.help_text }}</p>{% endif %}
+                        {{ champ.errors }}
+                    {% endfor %}
+                    <button class="bouton-principal"
+                            type="submit">Enregistrer la version <span aria-hidden="true">→</span></button>
+                </form>
+            </section>
+            <section class="section-tableau section-apres">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">HISTORIQUE VERSIONNE</p>
+                        <h2>Regles par entite</h2>
+                    </div>
+                </div>
+                {% if regles %}
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Entite</th>
+                                    <th>Version</th>
+                                    <th>Date d'effet</th>
+                                    <th>Statut</th>
+                                    <th>Constantes</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for regle in regles %}
+                                    <tr>
+                                        <td>{{ regle.entite.nom }}</td>
+                                        <td><strong>{{ regle.version }}</strong></td>
+                                        <td>{{ regle.date_effet|date:"d/m/Y" }}</td>
+                                        <td>{{ regle.est_active|yesno:"Active,Inactive" }}</td>
+                                        <td>
+                                            {% if regle.parametres.seuil_reussite_cours != None %}Obtention: {{ regle.parametres.seuil_reussite_cours }}/100{% endif %}
+                                            {% if regle.parametres.seuil_reprise_cours != None %}<br>Reprise: {{ regle.parametres.seuil_reprise_cours }}/100{% endif %}
+                                            {% if regle.parametres.note_eliminatoire != None %}<br>Eliminatoire: {{ regle.parametres.note_eliminatoire }}/100{% endif %}
+                                            {% if regle.parametres.credits_requis != None %}<br>Credits: {{ regle.parametres.credits_requis }}{% endif %}
+                                            {% if regle.parametres.mentions %}<br>Mentions: {{ regle.parametres.mentions|length }}{% endif %}
+                                        </td>
+                                        <td><a class="lien-action"
+   href="{% url 'referentiels:modifier_regle_academique' regle.pk %}">Modifier</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="etat-vide">
+                        <strong>Aucune constante configuree</strong>
+                        <p>Ajoutez une version pour commencer l'historique academique de l'entite.</p>
+                    </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+{% endblock %}

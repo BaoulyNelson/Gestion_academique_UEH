@@ -1,0 +1,144 @@
+{% extends "base_admission.html" %}
+{% load static %}
+{% block titre %}Informations de profil | Admission UEH{% endblock %}
+{% block contenu %}
+<div class="page-formulaire profil-candidat">
+  <h1>Informations de Profil</h1>
+  <nav class="progression-profil" aria-label="Étapes du profil">
+    <div class="etape-profil {% if etape_personnelle_complete %}est-terminee{% endif %} {% if etape_personnelle_active %}est-active{% endif %}">
+      <span>{% if etape_personnelle_complete %}<i class="bi bi-check-lg"></i>{% else %}1{% endif %}</span><small>Personnel</small>
+    </div>
+    <div class="etape-profil {% if etape_adresse_complete %}est-terminee{% endif %} {% if etape_adresse_active %}est-active{% endif %}">
+      <span>{% if etape_adresse_complete %}<i class="bi bi-check-lg"></i>{% else %}2{% endif %}</span><small>Adresse</small>
+    </div>
+    <div class="etape-profil {% if etape_ecole_complete %}est-terminee{% endif %} {% if etape_ecole_active %}est-active{% endif %}">
+      <span>{% if etape_ecole_complete %}<i class="bi bi-check-lg"></i>{% else %}3{% endif %}</span><small>École</small>
+    </div>
+    <div class="etape-profil {% if etape_etudes_active %}est-active{% endif %}">
+      <span>4</span><small>Institution/Étude/Document</small>
+    </div>
+  </nav>
+
+  {% if etape == 1 %}
+  <div class="alert alert-info" role="note"><strong>Important :</strong> votre profil doit être entièrement complété (au moins 3 étapes) pour pouvoir vous inscrire dans une entité universitaire.</div>
+  {% endif %}
+
+  <form method="post" enctype="multipart/form-data" class="formulaire-principal formulaire-etape-profil" data-profil-etape data-url-communes="{% url 'candidats:communes' %}">
+    {% csrf_token %}<input type="hidden" name="etape" value="{{ etape }}">
+    {% if formulaire.non_field_errors %}<div class="alert alert-danger">{{ formulaire.non_field_errors }}</div>{% endif %}
+
+    {% if etape == 1 %}
+    <section class="profil-section">
+      <h2>Informations Personnelles</h2>
+      <div class="row">
+        {% for champ in champs_etape %}
+        {% if champ.name == "document_nif" %}
+        <div class="col-md-6 mb-3" data-fichier-identifiant="nif" data-deja-depose="{% if documents_existants.NIF %}true{% else %}false{% endif %}" hidden>
+        {% elif champ.name == "document_ninu" %}
+        <div class="col-md-6 mb-3" data-fichier-identifiant="ninu" data-deja-depose="{% if documents_existants.NINU %}true{% else %}false{% endif %}" hidden>
+        {% else %}
+        <div class="col-md-6 mb-3">
+        {% endif %}
+          <label class="form-label" for="{{ champ.id_for_label }}">{{ champ.label }}{% if champ.field.required %}<span class="texte-requis"> *</span>{% endif %}</label>
+          {{ champ }}
+          {% if champ.help_text %}<div class="form-text">{{ champ.help_text }}</div>{% endif %}
+          {% for erreur in champ.errors %}<div class="invalid-feedback d-block">{{ erreur }}</div>{% endfor %}
+          {% if champ.name == "document_naissance" and documents_existants.NAISSANCE %}<a class="profil-document-actuel" data-apercu-document data-titre-document="Acte de Naissance" data-url-telechargement="{% url 'documents:telecharger' documents_existants.NAISSANCE.pk %}" href="{% url 'documents:apercu' documents_existants.NAISSANCE.pk %}">Voir le document actuel</a>{% endif %}
+          {% if champ.name == "photo_identite" and documents_existants.PHOTO %}<a class="profil-document-actuel" data-apercu-document data-titre-document="Photo d’identité" data-url-telechargement="{% url 'documents:telecharger' documents_existants.PHOTO.pk %}" href="{% url 'documents:apercu' documents_existants.PHOTO.pk %}">Voir la photo actuelle</a>{% endif %}
+          {% if champ.name == "document_nif" and documents_existants.NIF %}<a class="profil-document-actuel" data-apercu-document data-titre-document="Document NIF" data-url-telechargement="{% url 'documents:telecharger' documents_existants.NIF.pk %}" href="{% url 'documents:apercu' documents_existants.NIF.pk %}">Voir le document NIF actuel</a>{% endif %}
+          {% if champ.name == "document_ninu" and documents_existants.NINU %}<a class="profil-document-actuel" data-apercu-document data-titre-document="Document NINU" data-url-telechargement="{% url 'documents:telecharger' documents_existants.NINU.pk %}" href="{% url 'documents:apercu' documents_existants.NINU.pk %}">Voir le document NINU actuel</a>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      <div class="alert alert-primary" role="note"><strong>Note :</strong> vous devez fournir au moins l’un des deux identifiants (NINU ou NIF), avec le document correspondant. Si vous n’avez pas encore 18 ans, fournissez le NIF ou le NINU d’un parent ainsi que son nom et son prénom.</div>
+    </section>
+    <div class="actions-formulaire"><button class="btn btn-primary" name="action" value="suivant" type="submit">Suivant : Informations d’Adresse <i class="bi bi-arrow-right"></i></button></div>
+
+    {% elif etape == 2 %}
+    <section class="profil-section">
+      <h2>Informations d’Adresse</h2>
+      <div class="row">
+        {% for champ in champs_etape %}
+        <div class="col-md-6 mb-3">
+          <label class="form-label" for="{{ champ.id_for_label }}">{{ champ.label }}{% if champ.field.required %}<span class="texte-requis"> *</span>{% endif %}</label>
+          {{ champ }}
+          {% if champ.help_text %}<div class="form-text">{{ champ.help_text }}</div>{% endif %}
+          {% for erreur in champ.errors %}<div class="invalid-feedback d-block">{{ erreur }}</div>{% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    <div class="actions-formulaire">
+      <button class="btn btn-outline-secondary" name="action" value="retour" type="submit"><i class="bi bi-arrow-left"></i> Retour : Informations Personnelles</button>
+      <button class="btn btn-primary" name="action" value="suivant" type="submit">Suivant : Informations de l’École <i class="bi bi-arrow-right"></i></button>
+    </div>
+
+    {% elif etape == 3 %}
+    <section class="profil-section">
+      <h2>Informations Scolaires</h2>
+      <h3 class="h5">Écoles Enregistrées</h3>
+      <div class="liste-ecoles-profil">
+        {% for ecole in ecoles %}
+        <div class="ecole-profil-enregistree"><strong>{{ ecole.nom }}</strong><span>{{ ecole.zone|default:"Zone non précisée" }}</span><a data-apercu-document data-titre-document="Certificat scolaire — {{ ecole.nom }}" data-url-telechargement="{% url 'candidats:certificat_ecole' ecole.pk %}" href="{% url 'candidats:apercu_ecole' ecole.pk %}">Voir le certificat scolaire</a></div>
+        {% empty %}<p class="etat-liste-profil">Aucune école n’a encore été enregistrée. Utilisez le formulaire ci-dessous pour ajouter une école.</p>{% endfor %}
+      </div>
+      <div class="profil-sous-section">
+        <h3 class="h5">Dernière école fréquentée</h3>
+        <div class="row">
+          {% for champ in champs_etape %}
+          <div class="col-md-6 mb-3">
+            <label class="form-label" for="{{ champ.id_for_label }}">{{ champ.label }}{% if champ.field.required %}<span class="texte-requis"> *</span>{% endif %}</label>
+            {{ champ }}
+            {% if champ.help_text %}<div class="form-text">{{ champ.help_text }}</div>{% endif %}
+            {% for erreur in champ.errors %}<div class="invalid-feedback d-block">{{ erreur }}</div>{% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+    <div class="actions-formulaire">
+      <button class="btn btn-outline-secondary" name="action" value="retour" type="submit"><i class="bi bi-arrow-left"></i> Retour : Informations d’Adresse</button>
+      <button class="btn btn-primary" name="action" value="suivant" type="submit">Suivant : Institution/Étude/Document <i class="bi bi-arrow-right"></i></button>
+    </div>
+
+    {% else %}
+    <section class="profil-section">
+      <h2>Institution/Étude/Document</h2>
+      <div class="alert alert-info">Si vous n’avez pas fait d’études supérieures, vous pouvez terminer votre profil sans ajouter de parcours.</div>
+      <h3 class="h5">Mes Institutions/Études/Documents</h3>
+      <div class="liste-ecoles-profil">
+        {% for item in parcours %}
+        <div class="ecole-profil-enregistree"><strong>{{ item.etablissement }}</strong><span>{{ item.get_niveau_display }} {{ item.programme }}</span>
+          {% if item.certificat %}<a data-apercu-document data-titre-document="Certificat/Relevé — {{ item.etablissement }}" data-url-telechargement="{% url 'candidats:document_parcours' item.pk 'certificat' %}" href="{% url 'candidats:apercu_parcours' item.pk 'certificat' %}">Voir Certificat/Relevé</a>{% endif %}
+          {% if item.lettre_recommandation %}<a data-apercu-document data-titre-document="Lettre de recommandation — {{ item.etablissement }}" data-url-telechargement="{% url 'candidats:document_parcours' item.pk 'lettre_recommandation' %}" href="{% url 'candidats:apercu_parcours' item.pk 'lettre_recommandation' %}">Voir lettre de recommandation</a>{% endif %}
+          {% if item.lettre_motivation %}<a data-apercu-document data-titre-document="Lettre de motivation — {{ item.etablissement }}" data-url-telechargement="{% url 'candidats:document_parcours' item.pk 'lettre_motivation' %}" href="{% url 'candidats:apercu_parcours' item.pk 'lettre_motivation' %}">Voir lettre de motivation</a>{% endif %}
+          {% if item.cv_ou_autre_document %}<a data-apercu-document data-titre-document="CV / autre document — {{ item.etablissement }}" data-url-telechargement="{% url 'candidats:document_parcours' item.pk 'cv_ou_autre_document' %}" href="{% url 'candidats:apercu_parcours' item.pk 'cv_ou_autre_document' %}">Voir CV / autre document</a>{% endif %}
+        </div>
+        {% empty %}<p class="etat-liste-profil">Aucune information concernant votre parcours éducatif n’a encore été ajoutée.</p>{% endfor %}
+      </div>
+      <div class="profil-sous-section">
+        <h3 class="h5">Ajouter une Institution, un Parcours Éducatif ou un Document</h3>
+        <div class="row">
+          {% for champ in champs_etape %}
+          <div class="col-md-6 mb-3">
+            <label class="form-label" for="{{ champ.id_for_label }}">{{ champ.label }}{% if champ.field.required %}<span class="texte-requis"> *</span>{% endif %}</label>
+            {{ champ }}
+            {% if champ.help_text %}<div class="form-text">{{ champ.help_text }}</div>{% endif %}
+            {% for erreur in champ.errors %}<div class="invalid-feedback d-block">{{ erreur }}</div>{% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="actions-formulaire actions-etudes">
+          <button class="btn btn-primary" name="action" value="ajouter" type="submit">Enregistrer</button>
+        </div>
+      </div>
+    </section>
+    <div class="actions-formulaire">
+      <button class="btn btn-outline-secondary" name="action" value="retour" type="submit"><i class="bi bi-arrow-left"></i> Retour : Informations Scolaires</button>
+      <button class="btn btn-success" name="action" value="terminer" type="submit">Terminer le profil <i class="bi bi-check2"></i></button>
+    </div>
+    {% endif %}
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/profil-etapes.js' %}" defer></script>{% endblock %}

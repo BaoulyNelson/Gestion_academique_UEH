@@ -1,0 +1,86 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Configuration | {{ configuration.nom_site }}{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">{{ configuration.nom_site }} <span>/</span> Configuration</p>
+                    <h1>Configuration du site</h1>
+                </div>
+            </header>
+            <section class="bienvenue configuration-bienvenue">
+                <div>
+                    <p class="surtitre">IDENTITE DU SITE</p>
+                    <h2>{{ configuration.slogan }}</h2>
+                    <p>Ces informations sont affichees sur la page publique.</p>
+                </div>
+                <div id="apercu-logo-site"
+                     class="configuration-logo-apercu{% if configuration.logo %} avec-image{% endif %}"
+                     aria-live="polite">
+                    {% if configuration.logo %}
+                        <img src="{{ configuration.logo.url }}"
+                             alt="Logo de {{ configuration.nom_site }}">
+                    {% else %}
+                        <span aria-hidden="true">{{ configuration.nom_site|first|default:"S"|upper }}</span>
+                    {% endif %}
+                </div>
+            </section>
+            {% for message in messages %}<div class="alerte" role="status">{{ message }}</div>{% endfor %}
+            <section class="section-tableau configuration-section">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">IDENTITE ET COORDONNEES</p>
+                        <h2>Personnaliser le site public</h2>
+                    </div>
+                </div>
+                <form method="post"
+                      enctype="multipart/form-data"
+                      class="formulaire-connexion configuration-formulaire">
+                    {% csrf_token %}
+                    {{ formulaire.non_field_errors }}
+                    {% for champ in formulaire %}
+                        <div class="configuration-champ">
+                            <label for="{{ champ.id_for_label }}">{{ champ.label }}</label>
+                            {{ champ }}
+                            {% if champ.name == "logo" %}
+                                <small class="texte-secondaire">L'aperçu se met a jour des que vous choisissez une image.</small>
+                            {% endif %}
+                            {% if champ.help_text %}<small class="texte-secondaire">{{ champ.help_text }}</small>{% endif %}
+                            {% for erreur in champ.errors %}<small class="erreur-champ"
+       role="alert">{{ erreur }}</small>{% endfor %}
+                        </div>
+                    {% endfor %}
+                    <button class="bouton-principal"
+                            type="submit">Enregistrer la configuration <span aria-hidden="true">→</span></button>
+                </form>
+            </section>
+        </main>
+    </div>
+    <script>
+        (() => {
+            const champLogo = document.getElementById("id_logo");
+            const apercu = document.getElementById("apercu-logo-site");
+            if (!champLogo || !apercu) return;
+
+            let urlApercu = null;
+            champLogo.addEventListener("change", () => {
+                const fichier = champLogo.files && champLogo.files[0];
+                if (!fichier || !fichier.type.startsWith("image/")) return;
+
+                if (urlApercu) URL.revokeObjectURL(urlApercu);
+                urlApercu = URL.createObjectURL(fichier);
+
+                let image = apercu.querySelector("img");
+                if (!image) {
+                    apercu.replaceChildren();
+                    image = document.createElement("img");
+                    apercu.appendChild(image);
+                }
+                image.src = urlApercu;
+                image.alt = "Apercu du logo selectionne";
+                apercu.classList.add("avec-image");
+            });
+        })();
+    </script>
+{% endblock %}

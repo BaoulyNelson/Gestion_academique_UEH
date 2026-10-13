@@ -1,0 +1,19 @@
+{% extends "base_admission.html" %}
+{% load static %}
+{% block titre %}Vérifiez votre adresse e-mail | Admission UEH{% endblock %}
+{% block styles_complementaires %}<link href="{% static 'css/auth.css' %}" rel="stylesheet">{% endblock %}
+{% block contenu %}
+<section class="auth-page">
+    <div class="auth-entete">
+        <span class="auth-sceau auth-sceau-succes"><i class="bi bi-envelope-check"></i></span>
+        <p class="sur-titre">DERNIÈRE ÉTAPE DE CRÉATION</p>
+        <h1>Vérifiez votre adresse e-mail</h1>
+        <p>Un message de confirmation vient de vous être envoyé. Ouvrez-le et suivez le lien pour activer votre compte.</p>
+    </div>
+    <div class="formulaire-auth">
+        <div class="auth-note"><i class="bi bi-info-circle"></i><span>Vous ne voyez pas le message ? Vérifiez vos courriers indésirables et attendez quelques minutes.</span></div>
+        <a class="btn btn-primary bouton-auth" href="{% url 'tableau_bord:accueil' %}">Retour à l’accueil</a>
+        <p class="lien-auth-bas">Après confirmation, vous pourrez vous connecter et poursuivre votre candidature.</p>
+    </div>
+</section>
+{% endblock %}

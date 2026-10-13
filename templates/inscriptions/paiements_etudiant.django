@@ -1,0 +1,92 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Mes paiements | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Inscriptions</p>
+                    <h1>Mes paiements</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            <section class="bienvenue">
+                <div>
+                    <p class="surtitre">FRAIS DE SCOLARITE</p>
+                    <h2>Declaration de paiement</h2>
+                    <p>Les paiements soumis restent en attente jusqu'a leur verification par le registrariat.</p>
+                </div>
+                <div class="bienvenue-marque" aria-hidden="true"><span>UEH</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span></div>
+            </section>
+            {% for message in messages %}<div class="alerte" role="status">{{ message }}</div>{% endfor %}
+            <section class="section-tableau" style="margin-top: 18px;">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">NOUVELLE DECLARATION</p>
+                        <h2>Enregistrer un versement</h2>
+                    </div>
+                </div>
+                {% if tarifs_disponibles %}
+                    <form method="post"
+                          class="formulaire-connexion"
+                          style="padding: 22px;
+                                 margin: 0">
+                        {% csrf_token %}
+                        {{ formulaire.non_field_errors }}
+                        <label for="{{ formulaire.tarif.id_for_label }}">{{ formulaire.tarif.label }}</label>{{ formulaire.tarif }}{{ formulaire.tarif.errors }}
+                        <label for="{{ formulaire.montant.id_for_label }}">{{ formulaire.montant.label }}</label>{{ formulaire.montant }}{{ formulaire.montant.errors }}
+                        <label for="{{ formulaire.reference.id_for_label }}">{{ formulaire.reference.label }}</label>{{ formulaire.reference }}{{ formulaire.reference.errors }}
+                        <label for="{{ formulaire.date_paiement.id_for_label }}">{{ formulaire.date_paiement.label }}</label>{{ formulaire.date_paiement }}{{ formulaire.date_paiement.errors }}
+                        <button class="bouton-principal"
+                                type="submit">Soumettre le paiement <span aria-hidden="true">→</span></button>
+                    </form>
+                {% else %}
+                    <div class="etat-vide">
+                        <span class="etat-vide-symbole" aria-hidden="true">i</span>
+                        <div>
+                            <strong>Aucun tarif ouvert pour votre entite</strong>
+                            <p>Le registrariat doit publier un tarif pour une periode d'inscription ouverte.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+            <section class="section-tableau" style="margin-top: 18px;">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">HISTORIQUE</p>
+                        <h2>Declarations precedentes</h2>
+                    </div>
+                </div>
+                {% if paiements %}
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Reference</th>
+                                    <th>Programme</th>
+                                    <th>Periode</th>
+                                    <th>Montant</th>
+                                    <th>Statut</th>
+                                    <th>Confirme</th>
+                                    <th>Recu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for paiement in paiements %}<tr><td><strong>{{ paiement.reference }}</strong></td><td>{{ paiement.tarif.programme.nom }}</td><td>{{ paiement.tarif.periode.nom }}</td><td>{{ paiement.montant }} {{ paiement.tarif.devise }}</td><td><span class="badge-statut statut-{{ paiement.statut }}">{{ paiement.get_statut_display }}</span></td><td>{{ paiement.total_confirme }} {{ paiement.tarif.devise }}{% if paiement.motif_refus %}<br>{{ paiement.motif_refus }}{% endif %}</td><td>{% if paiement.statut == "valide" %}<a class="lien-action"
+   href="{% url 'inscriptions:recu_paiement' paiement.pk %}">Recu PDF</a>{% endif %}</td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="etat-vide">
+                        <span class="etat-vide-symbole" aria-hidden="true">→</span>
+                        <div>
+                            <strong>Aucun paiement declare</strong>
+                            <p>Vos declarations et leurs decisions apparaitront ici.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+{% endblock %}

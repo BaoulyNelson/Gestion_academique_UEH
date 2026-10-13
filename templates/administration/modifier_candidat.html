@@ -1,0 +1,61 @@
+{% extends "base_admission.html" %}
+{% block titre %}Dossier du candidat #{{ inscription.numero_dossier }} | Admission UEH{% endblock %}
+{% block contenu %}
+    <div class="page-formulaire page-formulaire-administration">
+        <a class="retour-page"
+           href="{% url 'resultats:mes_resultats' %}"><i class="bi bi-arrow-left"></i> Résultats de mon entité</a>
+        <p class="sur-titre mt-4">DOSSIER #{{ inscription.numero_dossier }} · {{ inscription.entite.code }}</p>
+        <h1>Modifier le dossier du candidat</h1>
+        <form method="post"
+              enctype="multipart/form-data"
+              class="formulaire-principal"
+              data-confirmation-suppression="formset"
+              data-message-confirmation="Confirmer la suppression des éléments sélectionnés ?">
+            {% csrf_token %}
+            <fieldset class="groupe-champs-administration">
+                <legend>Identité et coordonnées</legend>
+                {% for field in formulaire %}
+                    <div class="{% if field.widget.input_type == 'checkbox' %}champ-case-a-cocher{% else %}champ-administration{% endif %}">
+                        {% if field.widget.input_type == "checkbox" %}
+                            {{ field }}<label class="form-check-label"
+       for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {% else %}
+                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                        {% endif %}
+                        {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                    </div>
+                {% endfor %}
+            </fieldset>
+            {% for error in formulaire.non_field_errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+            {% for groupe in formsets %}
+                <h2 class="titre-groupe-formulaire">{{ groupe.titre }}</h2>
+                {{ groupe.formset.management_form }}
+                {% for error in groupe.formset.non_form_errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+                {% for ligne in groupe.formset %}
+                    <fieldset class="section-formulaire-inscription">
+                        <legend>{{ groupe.titre }} · {{ forloop.counter }}</legend>
+                        {% for hidden in ligne.hidden_fields %}{{ hidden }}{% endfor %}
+                        {% for field in ligne.visible_fields %}
+                            <div class="{% if field.widget.input_type == 'checkbox' %}champ-case-a-cocher{% else %}champ-administration{% endif %}">
+                                {% if field.widget.input_type == "checkbox" %}
+                                    {{ field }}<label class="form-check-label"
+       for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {% else %}
+                                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                {% endif %}
+                                {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                        {% endfor %}
+                    </fieldset>
+                {% endfor %}
+            {% endfor %}
+            <div class="actions-formulaire">
+                <a class="btn btn-outline-secondary"
+                   href="{% url 'resultats:mes_resultats' %}">Annuler</a>
+                <button class="btn btn-primary" type="submit">Enregistrer le dossier</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

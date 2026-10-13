@@ -1,0 +1,32 @@
+{% extends "base_admission.html" %}
+{% load static %}
+{% block titre %}Créer un compte | Admission UEH{% endblock %}
+{% block styles_complementaires %}<link href="{% static 'css/auth.css' %}" rel="stylesheet">{% endblock %}
+{% block contenu %}
+<section class="auth-page auth-page-focus">
+    <div class="auth-entete">
+        <img class="auth-sceau auth-logo" src="{% static 'images/logo.png' %}" alt="Logo de l’Université d’État d’Haïti">
+        <p class="sur-titre">UNIVERSITÉ D'ÉTAT D'HAÏTI</p>
+        <h1>Créer un compte</h1>
+        <p>Commencez votre dossier de candidature aux concours d'admission.</p>
+    </div>
+    <form class="formulaire-auth" method="post" action="{% url 'account_signup' %}">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+        {% for champ in form %}
+            {% if champ.is_hidden %}{{ champ }}{% else %}
+            <div class="champ-auth">
+                <label for="{{ champ.id_for_label }}">{{ champ.label }}{% if champ.field.required %}<span class="texte-requis"> *</span>{% endif %}</label>
+                {{ champ }}
+                {% if champ.help_text %}<div class="form-text">{{ champ.help_text }}</div>{% endif %}
+                {% for erreur in champ.errors %}<div class="invalid-feedback d-block">{{ erreur }}</div>{% endfor %}
+            </div>
+            {% endif %}
+        {% endfor %}
+        {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% endif %}
+        <button class="btn btn-primary bouton-auth" type="submit">Créer mon compte <i class="bi bi-arrow-right"></i></button>
+        <p class="lien-auth-bas">Vous avez déjà un compte ? <a href="{% url 'account_login' %}">Se connecter</a></p>
+    </form>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{% static 'js/focus-champ-auth.js' %}" defer></script>{% endblock %}

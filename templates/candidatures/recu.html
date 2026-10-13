@@ -1,0 +1,52 @@
+{% extends "base_admission.html" %} {% block titre %}Reçu #{{ inscription.numero_dossier }} | Admission UEH{% endblock %} {% block contenu %}
+  <div class="page-formulaire">
+    <a class="retour-page"
+       href="{% url 'candidatures:detail' inscription.pk %}"><i class="bi bi-arrow-left"></i> Dossier #{{ inscription.numero_dossier}}</a>
+    <p class="sur-titre mt-4">JUSTIFICATIF D'INSCRIPTION</p>
+    <h1>Reçu de dossier</h1>
+    <div class="recu-officiel">
+      <div class="recu-entete">
+        <span class="sceau-recu">UEH</span>
+        <div>
+          <strong>Université d'État d'Haïti</strong><span>Concours d'admission</span>
+        </div>
+        <span class="badge-statut statut-{{ inscription.statut|lower }}">{{ inscription.get_statut_display }}</span>
+      </div>
+      <div class="recu-numero">
+        NUMÉRO DE DOSSIER <strong>#{{ inscription.numero_dossier }}</strong>
+      </div>
+      <dl class="liste-detail">
+        <dt>Candidat</dt>
+        <dd>
+          {{ inscription.candidat.utilisateur.get_full_name|default:inscription.candidat.utilisateur.email }}
+        </dd>
+        <dt>Entité</dt>
+        <dd>
+          {{ inscription.entite.code }} - {{ inscription.entite.nom }}
+        </dd>
+        <dt>Option</dt>
+        <dd>
+          {{ inscription.option.nom|default:"Aucune option" }}
+        </dd>
+        <dt>Année académique</dt>
+        <dd>
+          {{ inscription.annee_academique }}
+        </dd>
+        <dt>Date de soumission</dt>
+        <dd>
+          {{ inscription.date_inscription|date:"d/m/Y à H:i" }}
+        </dd>
+      </dl>
+      <p class="mention-recu">Ce document confirme la réception de votre dossier de candidature.</p>
+    </div>
+    <a class="btn btn-primary mt-3"
+       href="{% url 'candidatures:pdf' inscription.pk %}"><i class="bi bi-printer"></i> Télécharger le reçu de dossier</a>{% if inscription.recu_paiement %}<a class="btn btn-outline-primary mt-3 ms-2"
+   href="{% url 'candidatures:telecharger_recu_paiement' inscription.pk %}"><i class="bi bi-download"></i> Télécharger la fiche de paiement</a>{% elif fiche_paiement %}<a class="btn btn-outline-primary mt-3 ms-2"
+   href="{% url 'documents:apercu' fiche_paiement.pk %}"
+   data-apercu-document
+   data-titre-document="Fiche de paiement"
+   data-url-telechargement="{% url 'documents:telecharger' fiche_paiement.pk %}"><i class="bi bi-download"></i> Télécharger la fiche de paiement</a>{% else %}
+    <p class="texte-intro mt-3">Aucune fiche de paiement n’a encore été téléversée.</p>
+{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Calendrier des examens | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Notes</p>
+                    <h1>Calendrier des examens</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            {% include "partials/bienvenue.django" with bienvenue_surtitre="ORGANISATION ACADEMIQUE" bienvenue_titre="Les prochaines epreuves" bienvenue_description="Consultez les horaires, salles et cours des examens programmes." %}
+            {% if examens %}
+                <section class="section-tableau section-apres">
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Examen</th>
+                                    <th>Cours</th>
+                                    <th>Programme</th>
+                                    <th>Periode</th>
+                                    <th>Horaire</th>
+                                    <th>Salle</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for examen in examens %}
+                                    <tr>
+                                        <td><strong>{{ examen.libelle }}</strong></td>
+                                        <td>{{ examen.cours.code }} · {{ examen.cours.nom }}</td>
+                                        <td>{{ examen.cours.programme.nom }}</td>
+                                        <td>{{ examen.periode.nom }} · {{ examen.periode.annee_academique }}</td>
+                                        <td>{{ examen.date_debut|date:"d/m/Y H:i" }} – {{ examen.date_fin|date:"H:i" }}</td>
+                                        <td>{{ examen.salle }}</td>
+                                        <td><span class="badge-statut{% if examen.statut == 'annule' %} statut-refusee{% else %} statut-validee{% endif %}">{{ examen.get_statut_display }}</span></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            {% else %}
+                <section class="message-role section-apres" role="status">
+                    <strong>Aucun examen programme dans votre perimetre.</strong>
+                    <p>Les examens de vos cours affectes ou selectionnes apparaitront ici.</p>
+                </section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

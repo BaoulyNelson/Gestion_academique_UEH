@@ -1,0 +1,78 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Mes cours | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Enseignement</p>
+                    <h1>Mes cours</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            <section class="bienvenue">
+                <div>
+                    <p class="surtitre">LISTES DE CLASSE</p>
+                    <h2>Etudiants inscrits</h2>
+                    <p>Seuls les cours et periodes qui vous sont affectes sont affiches.</p>
+                </div>
+                <div class="bienvenue-marque" aria-hidden="true"><span>UEH</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span></div>
+            </section>
+            {% if affectations %}
+                {% for affectation in affectations %}
+                    <section class="section-tableau" style="margin-top: 18px;">
+                        <div class="section-entete">
+                            <div>
+                                <p class="surtitre">{{ affectation.cours.programme.nom }}</p>
+                                <h2>{{ affectation.cours.code }} · {{ affectation.cours.nom }}</h2>
+                            </div>
+                            <span class="badge-statut">{{ affectation.periode.nom }} · {{ affectation.periode.annee_academique }}</span>
+                            <a class="lien-action"
+                               href="{% url 'notes:saisir_evaluation' affectation.cours.id affectation.periode.id %}">Saisir les notes <span aria-hidden="true">→</span></a>
+                        </div>
+                        {% if affectation.etudiants_inscrits %}
+                            <div class="tableau-defilement">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Etudiant</th>
+                                            <th>Identifiant du compte</th>
+                                            <th>Programme</th>
+                                            <th>Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for selection in affectation.etudiants_inscrits %}
+                                            <tr>
+                                                <td><strong>{{ selection.inscription.etudiant.get_full_name|default:selection.inscription.etudiant.username }}</strong></td>
+                                                <td>{{ selection.inscription.etudiant.username }}</td>
+                                                <td>{{ selection.inscription.programme.nom }}</td>
+                                                <td><span class="badge-statut statut-validee">{{ selection.inscription.get_statut_display }}</span></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="etat-vide">
+                                <span class="etat-vide-symbole" aria-hidden="true">→</span>
+                                <div>
+                                    <strong>Aucun etudiant inscrit</strong>
+                                    <p>Aucune inscription validee ne correspond a ce cours pour cette periode.</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </section>
+                {% endfor %}
+            {% else %}
+                <section class="message-role" role="status">
+                    <strong>Aucun cours ne vous est affecte.</strong>
+                    <p>Les affectations de cours sont gerees par le registrariat.</p>
+                </section>
+            {% endif %}
+            <footer class="pied-page">
+                <span>GP7 · Gestion academique</span><span>Donnees limitees a vos affectations</span>
+            </footer>
+        </main>
+    </div>
+{% endblock %}

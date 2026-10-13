@@ -1,0 +1,80 @@
+{% extends "base_admission.html" %} {% block titre %}Gestion des inscriptions | Admission
+UEH{% endblock %} {% block contenu %}
+<div class="titre-section">
+  <div>
+    <p class="sur-titre">ESPACE ADMINISTRATEUR</p>
+    <h1>Inscriptions de mon entité</h1>
+  </div>
+  <a class="btn btn-outline-primary"
+     href="{% url 'administration:export_inscriptions' %}"><i class="bi bi-download"></i> Exporter en CSV</a>
+</div>
+<div class="table-responsive tableau-dossiers">
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th>Dossier</th>
+        <th>Candidat</th>
+        <th>Entité</th>
+        <th>Année</th>
+        <th>Statut</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for inscription in inscriptions %}
+        <tr>
+          <td>#{{ inscription.numero_dossier }}</td>
+          <td>{{ inscription.candidat.utilisateur.get_full_name|default:inscription.candidat.utilisateur.email }}</td>
+          <td>{{ inscription.entite.code }}</td>
+          <td>{{ inscription.annee_academique }}</td>
+          <td>
+            <span class="badge-statut statut-{{ inscription.statut|lower }}">{{ inscription.get_statut_display }}</span>
+          </td>
+          <td class="actions-admin">
+            <a href="{% url 'administration:affecter_salle' inscription.pk %}"
+               title="Affecter une salle"
+               aria-label="Affecter une salle au dossier #{{ inscription.numero_dossier }}"><i class="bi bi-door-open"></i></a><a href="{% url 'candidatures:recu' inscription.pk %}"
+   title="Voir le reçu"
+   aria-label="Voir le reçu #{{ inscription.numero_dossier }}"><i class="bi bi-receipt"></i></a><a href="{% url 'candidatures:pdf' inscription.pk %}"
+   title="Télécharger le PDF"
+   aria-label="Télécharger le PDF #{{ inscription.numero_dossier }}"><i class="bi bi-file-pdf"></i></a>
+            <form method="post"
+                  action="{% url 'administration:valider_inscription' inscription.pk %}">
+              {% csrf_token %}
+              <button type="submit"
+                      title="Valider le dossier"
+                      aria-label="Valider le dossier #{{ inscription.numero_dossier }}">
+                <i class="bi bi-check2-circle"></i>
+              </button>
+            </form>
+            <form method="post"
+                  action="{% url 'administration:rejeter_inscription' inscription.pk %}">
+              {% csrf_token %}
+              <button type="submit"
+                      title="Rejeter le dossier"
+                      aria-label="Rejeter le dossier #{{ inscription.numero_dossier }}">
+                <i class="bi bi-x-circle"></i>
+              </button>
+            </form>
+            <form method="post"
+              action="{% url 'administration:supprimer_inscription' inscription.pk %}"
+              data-confirmation-suppression="toujours"
+              data-message-confirmation="Supprimer définitivement ce dossier ?">
+              {% csrf_token %}
+              <button type="submit"
+                      title="Supprimer le dossier"
+                      aria-label="Supprimer le dossier #{{ inscription.numero_dossier }}">
+                <i class="bi bi-trash"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="6" class="texte-vide-tableau">Aucune inscription dans votre entité.</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+{
+    "recommendations": [
+        "monosans.djlint",
+        "jraylan.django-template-extension"
+    ]
+}

@@ -1,0 +1,88 @@
+{% extends "base_admission.html" %} {% block titre %} Introduction | Admission UEH {%endblock %} {% block contenu %}
+<article class="page-formulaire guide-documents">
+  <p class="sur-titre">INTRODUCTION</p>
+  <h1>Préparez votre dossier d’admission</h1>
+  <p class="guide-introduction">
+    Préparez vos documents et informations pour un processus d’admission
+    simplifié. Assurez-vous que vos documents sont valides, lisibles et
+    correctement numérisés. De nombreuses applications mobiles gratuites vous
+    permettent de numériser facilement vos documents en haute qualité.
+  </p>
+
+  <aside class="guide-note">
+    <strong>Note importante :</strong> la validation de votre candidature se
+    fait en deux étapes : une première vérification en ligne via cette
+    plateforme, puis une validation définitive en présentiel où vos documents
+    originaux seront examinés.
+  </aside>
+
+  <section class="guide-section">
+    <h2>Documents personnels</h2>
+    <ul>
+      <li>
+        <strong>Numéro d’Immatriculation Fiscale (NIF) ou Numéro d’Identification
+          Nationale Unique (NINU)</strong>
+        : assurez-vous qu’il est valide et lisible. Si vous n’avez pas encore de
+        NIF ou NINU personnel, vous pouvez utiliser celui de l’un de vos
+        parents.
+      </li>
+      <li><strong>Acte de naissance</strong> : document original.</li>
+      <li>
+        <strong>Photos d’identité</strong> : deux photos récentes au format
+        passeport, sur fond blanc.
+      </li>
+    </ul>
+  </section>
+
+  <section class="guide-section">
+    <h2>Documents éducatifs</h2>
+    <ul>
+      <li>
+        <strong>Diplôme de Baccalauréat</strong> : original et photocopie.
+      </li>
+      <li>
+        <strong>Attestation de réussite</strong> : à fournir si le diplôme n’est
+        pas encore disponible.
+      </li>
+    </ul>
+  </section>
+
+  <section class="guide-section">
+    <h2>Documents financiers</h2>
+    <ul>
+      <li>
+        <strong>Reçu des frais d’inscription</strong> : preuve de paiement
+        originale.
+      </li>
+    </ul>
+  </section>
+
+  <section class="guide-section">
+    <h2>Préparez vos documents numériques</h2>
+    <ul>
+      <li>
+        <strong>Scannez tous les documents</strong> au format PDF et en haute
+        qualité (300 DPI).
+      </li>
+      <li>
+        <strong>Photo numérique</strong> au format JPEG, sur fond blanc, en 35
+        mm × 45 mm.
+      </li>
+      <li>
+        <strong>Nommez clairement vos fichiers</strong> :
+        Nom_Prénom_TypeDocument.
+      </li>
+      <li><strong>Taille maximale</strong> : 2 Mo par document.</li>
+    </ul>
+  </section>
+
+  <div class="actions-formulaire">
+    <a class="btn btn-outline-primary" href="{% url 'documents:mes_documents' %}">
+      <i class="bi bi-file-earmark-arrow-up"></i> Préparer mes documents
+    </a>
+    <a class="btn btn-primary" href="{% url 'candidatures:creer' %}">
+      Continuer mon inscription <i class="bi bi-arrow-right"></i>
+    </a>
+  </div>
+</article>
+{% endblock %}

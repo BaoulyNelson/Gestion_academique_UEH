@@ -1,0 +1,11 @@
+{% if form.non_field_errors %}<div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>{% endif %}
+{% for champ in form %}
+    {% if champ.is_hidden %}{{ champ }}{% else %}
+    <div class="champ-auth">
+        <label for="{{ champ.id_for_label }}">{{ champ.label }}{% if champ.field.required %}<span class="texte-requis"> *</span>{% endif %}</label>
+        {{ champ }}
+        {% if champ.help_text %}<div class="form-text">{{ champ.help_text }}</div>{% endif %}
+        {% for erreur in champ.errors %}<div class="invalid-feedback d-block">{{ erreur }}</div>{% endfor %}
+    </div>
+    {% endif %}
+{% endfor %}

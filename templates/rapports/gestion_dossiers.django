@@ -1,0 +1,72 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Dossiers d'etudes | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Registrariat</p>
+                    <h1>Dossiers d'etudes</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            {% include "partials/bienvenue.django" with bienvenue_surtitre="REGISTRARIAT" bienvenue_titre="Suivi des parcours etudiants" bienvenue_description="Ouvrez et gerez les dossiers academiques des etudiants de votre entite." %}
+            {% for message in messages %}<div class="alerte" role="status">{{ message }}</div>{% endfor %}
+            <section class="section-tableau section-apres">
+                <div class="section-entete"><div><p class="surtitre">{% if dossier_modifie %}MISE A JOUR{% else %}NOUVEAU DOSSIER{% endif %}</p><h2>{% if dossier_modifie %}Modifier le dossier{% else %}Ouvrir un dossier d'etudes{% endif %}</h2></div>{% if dossier_modifie %}<a class="bouton-secondaire"
+   href="{% url 'rapports:gestion_dossiers' %}">Annuler la modification</a>{% endif %}</div>
+                <form method="post"
+                      class="formulaire-connexion formulaire-dossier-rapports">
+                    {% csrf_token %}
+                    {{ formulaire.non_field_errors }}
+                    {% for champ in formulaire %}
+                        <label for="{{ champ.id_for_label }}">{{ champ.label }}</label>
+                        {{ champ }}
+                        {{ champ.errors }}
+                    {% endfor %}
+                    <p class="texte-secondaire">Un dossier ferme, abandonne ou diplome exige une date de cloture. Indiquez le motif pour conserver la trace de la decision.</p>
+                    <button class="bouton-principal"
+                            type="submit">Enregistrer le dossier <span aria-hidden="true">→</span></button>
+                </form>
+            </section>
+            <section class="section-tableau section-apres">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">SUIVI DU PARCOURS</p>
+                        <h2>Dossiers de l'entite</h2>
+                    </div>
+                </div>
+                {% if dossiers %}
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Etudiant</th>
+                                    <th>Code</th>
+                                    <th>Programme</th>
+                                    <th>Ouverture</th>
+                                    <th>Cloture</th>
+                                    <th>Statut</th>
+                                    <th>Motif de cloture</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dossier in dossiers %}<tr><td><strong>{{ dossier.etudiant.get_full_name|default:dossier.etudiant.username }}</strong></td><td>{{ dossier.etudiant.profil_etudiant.code_etudiant|default:"-" }}</td><td>{{ dossier.programme.nom }}</td><td>{{ dossier.date_ouverture|date:"d/m/Y" }}</td><td>{{ dossier.date_cloture|date:"d/m/Y"|default:"-" }}</td><td><span class="badge-statut{% if dossier.statut == 'en_cours' %} statut-validee{% endif %}">{{ dossier.get_statut_display }}</span></td><td>{{ dossier.motif_cloture|default:"-" }}</td><td><a class="lien-action"
+   href="{% url 'rapports:modifier_dossier' dossier.pk %}">Modifier</a></td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="etat-vide">
+                        <span class="etat-vide-symbole" aria-hidden="true">→</span>
+                        <div>
+                            <strong>Aucun dossier d'etudes</strong>
+                            <p>Ouvrez un dossier pour suivre le parcours academique de l'etudiant.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base_admission.html" %}
+{% block titre %}Accès réservé aux candidats | Admission UEH{% endblock %}
+{% block contenu %}
+  <section class="container py-5">
+    <div class="mx-auto text-center" style="max-width: 680px">
+      <i class="bi bi-person-lock display-1 text-danger" aria-hidden="true"></i>
+      <p class="sur-titre mt-3">ACCÈS NON AUTORISÉ</p>
+      <h1>Cette page est réservée aux candidats</h1>
+      <p class="lead">
+        Le compte connecté n’a pas de profil candidat Admission. Un compte GP7
+        ne peut pas déposer une demande d’admission.
+      </p>
+      <p>
+        Pour poursuivre une demande, connectez-vous avec le compte candidat
+        créé sur le portail Admission. Si vous n’en avez pas, créez un compte
+        candidat avec une adresse courriel qui n’est pas déjà utilisée par un
+        compte GP7.
+      </p>
+      <a class="btn btn-primary mt-3" href="{% url 'tableau_bord:accueil' %}">
+        Retour à l’accueil public
+      </a>
+    </div>
+  </section>
+{% endblock %}

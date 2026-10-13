@@ -1,0 +1,154 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Mon profil | {{ site_config.nom_site }}{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">{{ site_config.nom_site }} <span>/</span> Mon profil</p>
+                    <h1>Mon profil</h1>
+                </div>
+            </header>
+            <section class="bienvenue profil-bienvenue"
+                     aria-label="Informations du compte">
+                <div>
+                    <p class="surtitre">ESPACE PERSONNEL</p>
+                    <h2>{{ user.get_full_name|default:user.username }}</h2>
+                    <p>{{ user.get_role_display }}{% if user.entite %} · {{ user.entite.nom }}{% endif %}</p>
+                    <p class="profil-email">{{ user.email }}</p>
+                </div>
+                <span class="avatar-utilisateur avatar-profil" aria-hidden="true">
+                    {% if user.photo_profil %}
+                        <img src="{{ user.photo_profil.url }}" alt="">
+                    {% else %}
+                        {{ user.first_name|first|default:user.username|first|upper }}
+                    {% endif %}
+                </span>
+            </section>
+            {% for message in messages %}<div class="alerte" role="status">{{ message }}</div>{% endfor %}
+            <div class="profil-grille">
+                <section class="section-tableau profil-section">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">PHOTO DE PROFIL</p>
+                            <h2>Mettre a jour votre photo</h2>
+                        </div>
+                    </div>
+                    <form method="post"
+                          enctype="multipart/form-data"
+                          class="formulaire-connexion profil-formulaire">
+                        {% csrf_token %}
+                        <label for="photo_profil">Choisir une image</label>
+                        <input id="photo_profil" name="photo_profil" type="file" accept="image/*">
+                        <p class="texte-secondaire">Votre photo apparait dans le menu utilisateur. Sans photo, votre initiale est utilisee.</p>
+                        <button class="bouton-principal"
+                                type="submit">Enregistrer la photo <span aria-hidden="true">→</span></button>
+                    </form>
+                </section>
+                <section class="section-tableau profil-section">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">COMPTE</p>
+                            <h2>Informations personnelles</h2>
+                        </div>
+                    </div>
+                    <dl class="profil-informations">
+                        <div>
+                            <dt>Nom d'utilisateur</dt>
+                            <dd>
+                                {{ user.username }}
+                            </dd>
+                        </div>
+                        {% if user.role == "etudiant" %}
+                            <div>
+                                <dt>Code etudiant</dt>
+                                <dd>
+                                    {{ profil_etudiant.code_etudiant|default:"Non attribue" }}
+                                </dd>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <dt>Adresse e-mail</dt>
+                            <dd>
+                                {{ user.email }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Role</dt>
+                            <dd>
+                                {{ user.get_role_display }}
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>Entite</dt>
+                            <dd>
+                                {{ user.entite.nom|default:"Aucune entite associee" }}
+                            </dd>
+                        </div>
+                    </dl>
+                </section>
+            </div>
+            {% if user.role == "etudiant" %}
+                <section class="section-tableau profil-section section-apres">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">PARCOURS ACADEMIQUE</p>
+                            <h2>Mes dossiers d'etudes</h2>
+                        </div>
+                    </div>
+                    {% if dossiers_etudes %}
+                        {% for dossier in dossiers_etudes %}
+                            {% if not forloop.first %}<hr>{% endif %}
+                            <dl class="profil-informations">
+                                <div>
+                                    <dt>Programme</dt>
+                                    <dd>
+                                        {{ dossier.programme.nom }}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>Entite</dt>
+                                    <dd>
+                                        {{ dossier.programme.entite.nom }}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>Statut</dt>
+                                    <dd>
+                                        {{ dossier.get_statut_display }}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt>Ouverture</dt>
+                                    <dd>
+                                        {{ dossier.date_ouverture|date:"d/m/Y" }}
+                                    </dd>
+                                </div>
+                                {% if dossier.date_cloture %}
+                                    <div>
+                                        <dt>Cloture</dt>
+                                        <dd>
+                                            {{ dossier.date_cloture|date:"d/m/Y" }}
+                                        </dd>
+                                    </div>
+                                {% endif %}
+                                {% if dossier.motif_cloture %}
+                                    <div>
+                                        <dt>Motif</dt>
+                                        <dd>
+                                            {{ dossier.motif_cloture }}
+                                        </dd>
+                                    </div>
+                                {% endif %}
+                            </dl>
+                        {% endfor %}
+                    {% else %}
+                        <div class="etat-vide" role="status">
+                            <strong>Aucun dossier d'etudes n'est encore associe a votre compte.</strong>
+                        </div>
+                    {% endif %}
+                </section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

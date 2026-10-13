@@ -1,0 +1,115 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Publication des notes | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Registrariat</p>
+                    <h1>Publication des notes</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            <section class="bienvenue">
+                <div>
+                    <p class="surtitre">RESULTATS CONFIDENTIELS</p>
+                    <h2>Evaluations a verifier</h2>
+                    <p>La publication rend les notes visibles aux etudiants concernes.</p>
+                </div>
+                <div class="bienvenue-marque" aria-hidden="true"><span>UEH</span><span class="marque-point"></span><span class="marque-point"></span><span class="marque-point"></span></div>
+            </section>
+            {% for message in messages %}<div class="alerte" role="status">{{ message }}</div>{% endfor %}
+            {% if groupes %}
+                {% for groupe in groupes %}
+                    <section class="section-tableau section-apres">
+                        <div class="section-entete">
+                            <div>
+                                <p class="surtitre">{{ groupe.cours.programme.entite.nom }} · {{ groupe.periode.annee_academique }}</p>
+                                <h2>{{ groupe.cours.code }} · {{ groupe.cours.nom }}</h2>
+                            </div>
+                            <span class="badge-statut">{{ groupe.periode.nom }}</span>
+                        </div>
+                        <div class="tableau-defilement">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Etudiant</th>
+                                        <th>Evaluation</th>
+                                        <th>Note</th>
+                                        <th>Coefficient</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for evaluation in groupe.evaluations %}<tr><td><strong>{{ evaluation.etudiant.get_full_name|default:evaluation.etudiant.username }}</strong></td><td>{{ evaluation.libelle }}</td><td>{{ evaluation.note }}</td><td>{{ evaluation.coefficient }}</td></tr>{% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <form method="post"
+                              action="{% url 'notes:publier_notes_cours' groupe.cours.id groupe.periode.id %}"
+                              class="notes-actions">{% csrf_token %}<button class="bouton-principal" type="submit">Publier {{ groupe.evaluations|length }} resultats</button></form>
+                    </section>
+                {% endfor %}
+            {% else %}
+                <section class="message-role" role="status">
+                    <strong>Aucune note en attente de publication.</strong>
+                    <p>Les nouvelles evaluations soumises par les professeurs apparaitront ici.</p>
+                </section>
+            {% endif %}
+            <section class="section-apres">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">RESULTATS DEJA DIFFUSES</p>
+                        <h2>Notes publiees</h2>
+                    </div>
+                </div>
+                {% if groupes_publies %}
+                    {% for groupe in groupes_publies %}
+                        <section class="section-tableau section-apres">
+                            <div class="section-entete">
+                                <div>
+                                    <p class="surtitre">{{ groupe.cours.programme.entite.nom }} · {{ groupe.periode.annee_academique }}</p>
+                                    <h3>{{ groupe.cours.code }} · {{ groupe.cours.nom }}</h3>
+                                </div>
+                                <span class="badge-statut">{{ groupe.periode.nom }}</span>
+                            </div>
+                            <div class="tableau-defilement">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Etudiant</th>
+                                            <th>Evaluation</th>
+                                            <th>Note</th>
+                                            <th>Coefficient</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for evaluation in groupe.evaluations %}
+                                            <tr>
+                                                <td><strong>{{ evaluation.etudiant.get_full_name|default:evaluation.etudiant.username }}</strong></td>
+                                                <td>{{ evaluation.libelle }}</td>
+                                                <td>{{ evaluation.note }}</td>
+                                                <td>{{ evaluation.coefficient }}</td>
+                                                <td>
+                                                    <form method="post"
+                                                          action="{% url 'notes:retirer_publication_note' evaluation.pk %}"
+                                                          class="notes-actions">
+                                                        {% csrf_token %}
+                                                        <button class="bouton-secondaire"
+                                                                type="submit">Retirer la publication</button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    {% endfor %}
+                {% else %}
+                    <div class="etat-vide"><strong>Aucune note publiee dans votre entite.</strong></div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+{% endblock %}

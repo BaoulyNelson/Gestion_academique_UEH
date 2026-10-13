@@ -1,0 +1,34 @@
+{% extends "base_gp7.html" %}
+
+{% block titre %}Proces-verbal de soutenance | GP7{% endblock %}
+
+{% block contenu %}
+<style>
+    .pv-impression { width: min(100%, 820px); min-height: 720px; margin: 30px auto; padding: clamp(24px, 6vw, 62px); border: 1px solid #d7ddd7; background: #fff; }
+    .pv-entete { padding-bottom: 20px; border-bottom: 2px solid #1c493d; }
+    .pv-entete h1 { margin: 0; color: #1c493d; font-family: Georgia, serif; font-size: 20px; font-weight: 400; }
+    .pv-entete p { margin: 5px 0 0; color: #53615b; font-size: 10px; }
+    .pv-titre { margin: 48px 0 34px; text-align: center; }
+    .pv-titre p { margin: 0 0 8px; color: #d25b45; font-size: 10px; font-weight: 800; }
+    .pv-titre h2 { margin: 0; font-family: Georgia, serif; font-size: 26px; font-weight: 400; }
+    .pv-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 26px; margin-top: 30px; padding: 20px 0; border-top: 1px solid #e3e8e2; border-bottom: 1px solid #e3e8e2; }
+    .pv-meta span { display: block; color: #718078; font-size: 9px; text-transform: uppercase; }
+    .pv-meta strong { display: block; margin-top: 5px; font-size: 12px; }
+    .pv-jury { margin-top: 28px; line-height: 1.7; }
+    .pv-signature { margin: 70px 0 0 auto; width: 220px; padding-top: 10px; border-top: 1px solid #53615b; text-align: center; font-size: 10px; }
+    .pv-actions { display: flex; justify-content: flex-end; gap: 10px; max-width: 820px; margin: 0 auto 30px; }
+    @media print { body { background: #fff; } .barre-laterale, .entete-page, .pv-actions { display: none !important; } .contenu-principal { margin: 0; padding: 0; background: #fff; } .pv-impression { width: 100%; min-height: 0; margin: 0; padding: 18mm; border: 0; } }
+    @media (max-width: 560px) { .pv-meta { grid-template-columns: 1fr; } }
+</style>
+<main class="contenu-principal">
+    <header class="entete-page"><div><p class="fil-ariane">GP7 <span>/</span> Proces-verbaux</p><h1>Soutenance de memoire</h1></div><span class="profil-texte"><strong>{{ user.get_full_name|default:user.username }}</strong><small>Document de soutenance</small></span></header>
+    <article class="pv-impression">
+        <div class="pv-entete"><h1>UNIVERSITE D'ETAT D'HAITI</h1><p>{{ soutenance.programme.entite.nom }}</p></div>
+        <div class="pv-titre"><p>PROCES-VERBAL DE SOUTENANCE</p><h2>{{ soutenance.titre }}</h2></div>
+        <div class="pv-meta"><div><span>Etudiant</span><strong>{{ soutenance.etudiant.get_full_name|default:soutenance.etudiant.username }}</strong></div><div><span>Code etudiant</span><strong>{{ soutenance.etudiant.profil_etudiant.code_etudiant|default:"A renseigner" }}</strong></div><div><span>Programme</span><strong>{{ soutenance.programme.nom }}</strong></div><div><span>Periode</span><strong>{{ soutenance.periode.nom }} · {{ soutenance.periode.annee_academique }}</strong></div><div><span>Date de soutenance</span><strong>{{ soutenance.date_soutenance|date:"d/m/Y" }}</strong></div><div><span>Note</span><strong>{{ soutenance.note|default:"-" }}/100</strong></div></div>
+        <div class="pv-jury"><strong>Membres du jury</strong><br>{{ soutenance.jury|default:"Non renseigne"|linebreaksbr }}</div>
+        <div class="pv-signature">Enregistre par le Registrariat<br>{{ soutenance.enregistre_par.get_full_name|default:soutenance.enregistre_par.username }}</div>
+    </article>
+    <div class="pv-actions"><a class="bouton-secondaire" href="{% url 'rapports:proces_verbaux' %}">Retour aux proces-verbaux</a><button class="bouton-principal" type="button" onclick="window.print()">Imprimer / PDF <span aria-hidden="true">&#8594;</span></button></div>
+</main>
+{% endblock %}

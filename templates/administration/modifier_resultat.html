@@ -1,0 +1,50 @@
+{% extends "base_admission.html" %}
+{% block titre %}Résultat du dossier #{{ inscription.numero_dossier }} | Admission UEH{% endblock %}
+{% block contenu %}
+    <div class="page-formulaire page-formulaire-administration">
+        <a class="retour-page"
+           href="{% url 'resultats:mes_resultats' %}"><i class="bi bi-arrow-left"></i> Résultats de mon entité</a>
+        <p class="sur-titre mt-4">DOSSIER #{{ inscription.numero_dossier }}</p>
+        <h1>Gérer le résultat</h1>
+        <p class="texte-intro">{{ inscription.candidat.utilisateur.get_full_name|default:inscription.candidat.utilisateur.email }} · {{ inscription.entite.code }}</p>
+          <form method="post"
+              class="formulaire-principal"
+              data-confirmation-suppression="formset"
+              data-message-confirmation="Confirmer la suppression des épreuves sélectionnées ?">
+            {% csrf_token %}
+            <div class="form-check mb-4">
+                {{ formulaire.publie }}
+                <label class="form-check-label" for="{{ formulaire.publie.id_for_label }}">Publier ce résultat</label>
+                {% for error in formulaire.publie.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            {{ formset.management_form }}
+            {% for error in formset.non_form_errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+            <h2 class="h4">Épreuves et notes</h2>
+            {% for epreuve in formset %}
+                <fieldset class="section-formulaire-inscription">
+                    <legend>Épreuve {{ forloop.counter }}</legend>
+                    {% for hidden in epreuve.hidden_fields %}{{ hidden }}{% endfor %}
+                    {% for field in epreuve.visible_fields %}
+                        {% if field.name != "DELETE" %}
+                            <div class="{% if field.widget.input_type == 'checkbox' %}champ-case-a-cocher{% else %}champ-administration{% endif %}">
+                                {% if field.widget.input_type == "checkbox" %}
+                                    {{ field }}<label class="form-check-label"
+       for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                {% else %}
+                                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                    {{ field }}
+                                {% endif %}
+                                {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </fieldset>
+            {% endfor %}
+            <div class="actions-formulaire">
+                <a class="btn btn-outline-secondary"
+                   href="{% url 'resultats:mes_resultats' %}">Annuler</a>
+                <button class="btn btn-primary" type="submit">Enregistrer le résultat</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

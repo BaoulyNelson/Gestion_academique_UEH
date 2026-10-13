@@ -1,0 +1,20 @@
+{% extends "base_gp7.html" %}
+{% block titre %}{{ titre }} | {{ site_config.nom_site }}{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">{{ site_config.nom_site }} <span>/</span> Inscriptions</p>
+                    <h1>{{ titre }}</h1>
+                </div>
+            </header>
+            {% include "partials/bienvenue.django" with bienvenue_surtitre="DOSSIER ETUDIANT" bienvenue_titre="Votre situation academique" bienvenue_description="Consultez les informations ci-dessous pour comprendre la situation de votre dossier." %}
+            <section class="message-role section-apres" role="alert">
+                <strong>{{ message }}</strong>
+                <p>Si vous pensez que cette situation est incorrecte, contactez le Registrariat de votre entite.</p>
+                <a class="bouton-secondaire" href="{% url url_retour %}">{{ libelle_retour }}</a>
+            </section>
+        </main>
+    </div>
+{% endblock %}

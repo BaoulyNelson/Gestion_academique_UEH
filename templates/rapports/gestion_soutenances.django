@@ -1,0 +1,77 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Gestion des soutenances | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Registrariat</p>
+                    <h1>Gestion des soutenances</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            {% include "partials/bienvenue.django" with bienvenue_surtitre="REGISTRARIAT" bienvenue_titre="Organisation des jurys" bienvenue_description="Planifiez les soutenances et enregistrez les resultats des jurys." %}
+            {% for message in messages %}<div class="alerte" role="status">{{ message }}</div>{% endfor %}
+            <section class="section-tableau" style="margin-top: 18px;">
+                <div class="section-entete"><div><p class="surtitre">{% if soutenance_modifiee %}MISE A JOUR{% else %}NOUVELLE SOUTENANCE{% endif %}</p><h2>{% if soutenance_modifiee %}Modifier la soutenance{% else %}Planifier ou enregistrer{% endif %}</h2></div>{% if soutenance_modifiee %}<a class="bouton-secondaire"
+   href="{% url 'rapports:gestion_soutenances' %}">Annuler la modification</a>{% endif %}</div>
+                <form method="post"
+                      class="formulaire-connexion"
+                      style="max-width: 720px;
+                             padding: 22px;
+                             margin: 0">
+                    {% csrf_token %}
+                    {{ formulaire.non_field_errors }}
+                    {% for champ in formulaire %}
+                        <label for="{{ champ.id_for_label }}">{{ champ.label }}</label>
+                        {{ champ }}
+                        {{ champ.errors }}
+                    {% endfor %}
+                    <button class="bouton-principal"
+                            type="submit">Enregistrer la soutenance <span aria-hidden="true">→</span></button>
+                </form>
+            </section>
+            <section class="section-tableau" style="margin-top: 18px;">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">DOSSIER DES SOUTENANCES</p>
+                        <h2>Planifiees et realisees</h2>
+                    </div>
+                </div>
+                {% if soutenances %}
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Etudiant</th>
+                                    <th>Code</th>
+                                    <th>Programme</th>
+                                    <th>Memoire</th>
+                                    <th>Date</th>
+                                    <th>Statut</th>
+                                    <th>Note</th>
+                                    <th>Jury</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for soutenance in soutenances %}<tr><td><strong>{{ soutenance.etudiant.get_full_name|default:soutenance.etudiant.username }}</strong></td><td>{{ soutenance.etudiant.profil_etudiant.code_etudiant|default:"-" }}</td><td>{{ soutenance.programme.nom }} · {{ soutenance.periode.nom }}</td><td>{{ soutenance.titre }}</td><td>{{ soutenance.date_soutenance|date:"d/m/Y" }}</td><td><span class="badge-statut {% if soutenance.statut == 'soutenue' %}statut-validee{% endif %}">{{ soutenance.get_statut_display }}</span></td><td>{{ soutenance.note|default:"-" }}</td><td>{{ soutenance.jury|default:"-"|truncatechars:48 }}</td><td><a class="lien-action"
+   href="{% url 'rapports:modifier_soutenance' soutenance.pk %}">Modifier</a>{% if soutenance.statut == "soutenue" %} · <a class="lien-action"
+    href="{% url 'rapports:proces_verbal_imprimable' soutenance.pk %}">PV</a> · <a class="lien-action"
+    href="{% url 'rapports:telecharger_proces_verbal_pdf' soutenance.pk %}">PDF</a>{% endif %}</td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="etat-vide">
+                        <span class="etat-vide-symbole" aria-hidden="true">→</span>
+                        <div>
+                            <strong>Aucune soutenance enregistree</strong>
+                            <p>Planifiez la premiere soutenance de cette entite.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+{% endblock %}

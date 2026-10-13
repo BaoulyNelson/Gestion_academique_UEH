@@ -1,0 +1,80 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Programmer les examens | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Registrariat</p>
+                    <h1>Programmation des examens</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            {% include "partials/bienvenue.django" with bienvenue_surtitre="ORGANISATION ACADEMIQUE" bienvenue_titre="Planifier une session d'examens" bienvenue_description="Definissez les cours, les horaires et les salles des examens." %}
+            {% for message in messages %}<div class="alerte" role="status">{{ message }}</div>{% endfor %}
+            <section class="section-tableau section-apres">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">{% if examen_modifie %}MISE A JOUR{% else %}NOUVEL EXAMEN{% endif %}</p>
+                        <h2>{% if examen_modifie %}Modifier la programmation{% else %}Programmer un examen{% endif %}</h2>
+                    </div>
+                    {% if examen_modifie %}<a class="bouton-secondaire"
+   href="{% url 'notes:gestion_examens' %}">Annuler</a>{% endif %}
+                </div>
+                <form method="post" class="formulaire-connexion formulaire-gestion-examens">
+                    {% csrf_token %}
+                    {{ formulaire.non_field_errors }}
+                    {% for champ in formulaire %}
+                        <label for="{{ champ.id_for_label }}">{{ champ.label }}</label>
+                        {{ champ }}
+                        {{ champ.errors }}
+                    {% endfor %}
+                    <button class="bouton-principal"
+                            type="submit">Enregistrer l'examen <span aria-hidden="true">→</span></button>
+                </form>
+            </section>
+            <section class="section-tableau section-apres">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">PLANNING</p>
+                        <h2>Examens programmes</h2>
+                    </div>
+                </div>
+                {% if examens %}
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Examen</th>
+                                    <th>Cours</th>
+                                    <th>Periode</th>
+                                    <th>Date et salle</th>
+                                    <th>Statut</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for examen in examens %}
+                                    <tr>
+                                        <td><strong>{{ examen.libelle }}</strong></td>
+                                        <td>{{ examen.cours.code }} · {{ examen.cours.nom }}</td>
+                                        <td>{{ examen.periode.nom }} · {{ examen.periode.annee_academique }}</td>
+                                        <td>{{ examen.date_debut|date:"d/m/Y H:i" }}–{{ examen.date_fin|date:"H:i" }} · {{ examen.salle }}</td>
+                                        <td>{{ examen.get_statut_display }}</td>
+                                        <td><a class="lien-action"
+   href="{% url 'notes:modifier_examen' examen.pk %}">Modifier</a></td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="etat-vide">
+                        <strong>Aucun examen programme</strong>
+                        <p>Le planning de cette entite est vide.</p>
+                    </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+{% endblock %}

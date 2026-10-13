@@ -1,0 +1,236 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="color-scheme" content="light">
+        <title>{% block titre %}GP7 | Gestion academique{% endblock %}</title>
+        <link rel="stylesheet" href="{% static 'css/style_gp7.css' %}">
+    </head>
+    <body>
+        {% if user.is_authenticated and request.resolver_match and request.resolver_match.url_name not in "landing,landing_alt,contact,connexion,password_reset,password_reset_done,password_reset_confirm,password_reset_complete" %}
+            <aside class="barre-laterale">
+                <a class="marque marque-laterale"
+                   href="{% url 'comptes:tableau_de_bord' %}">
+                    {% if site_config.logo %}
+                        <img class="marque-logo" src="{{ site_config.logo.url }}" alt="">
+                    {% else %}
+                        <span class="marque-symbole"
+                              aria-hidden="true">{{ site_config.nom_site|first|default:"S"|upper }}</span>
+                    {% endif %}
+                    <span class="marque-libelle">{{ site_config.nom_site|default:"Mon site" }}<small>{{ site_config.slogan|default:"Espace academique" }}</small></span>
+                </a>
+                <p class="navigation-titre">ESPACE DE TRAVAIL</p>
+                {% include "partials/navigation.django" %}
+                <div class="aside-bas">
+                    <span class="pastille-etat" aria-hidden="true"></span>
+                    <span>{% if user.role == "personnel" and not user.entite_id %}Entite a rattacher{% else %}Acces securise{% endif %}</span>
+                </div>
+            </aside>
+            {% include "partials/navigation_mobile.django" %}
+            <button class="mobile-plus-backdrop"
+                    type="button"
+                    aria-label="Fermer le panneau Plus"
+                    hidden></button>
+            <aside class="mobile-plus-panel"
+                   id="mobile-plus-panel"
+                   role="dialog"
+                   aria-modal="true"
+                   aria-label="Plus"
+                   aria-hidden="true"
+                   inert>
+                <header class="mobile-plus-entete">
+                    <span>Plus</span>
+                    <button class="mobile-plus-fermer"
+                            type="button"
+                            aria-label="Fermer le panneau Plus">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="m6 6 12 12M18 6 6 18" />
+                        </svg>
+                    </button>
+                </header>
+                <div class="mobile-plus-contenu">
+                    <p class="mobile-plus-titre">{{ site_config.nom_site }}</p>
+                    {% include "partials/navigation_plus.django" %}
+                </div>
+            </aside>
+        {% endif %}
+        {% if user.is_authenticated and request.resolver_match and request.resolver_match.url_name not in "landing,landing_alt,contact,connexion,password_reset,password_reset_done,password_reset_confirm,password_reset_complete" %}
+            <div class="confirmation-deconnexion"
+                 id="confirmation-deconnexion"
+                 aria-hidden="true"
+                 inert
+                 hidden>
+                <button class="confirmation-deconnexion-fond"
+                        type="button"
+                        tabindex="-1"
+                        aria-label="Annuler la deconnexion"></button>
+                <section class="confirmation-deconnexion-dialogue"
+                         role="dialog"
+                         aria-modal="true"
+                         aria-labelledby="confirmation-deconnexion-titre"
+                         aria-describedby="confirmation-deconnexion-description"
+                         tabindex="-1">
+                    <span class="confirmation-deconnexion-icone" aria-hidden="true">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5M16 17l5-5-5-5M21 12H9" />
+                        </svg>
+                    </span>
+                    <p class="surtitre">FIN DE SESSION</p>
+                    <h2 id="confirmation-deconnexion-titre">Vous allez vous deconnecter</h2>
+                    <p id="confirmation-deconnexion-description">Votre session sera fermee sur cet appareil. Voulez-vous continuer ?</p>
+                    <div class="confirmation-deconnexion-actions">
+                        <button class="confirmation-deconnexion-annuler" type="button">Rester connecte</button>
+                        <button class="confirmation-deconnexion-confirmer" type="button">Oui, me deconnecter</button>
+                    </div>
+                </section>
+            </div>
+        {% endif %}
+        {% block contenu %}{% endblock %}
+        <script>
+        (() => {
+            const oeilOuvert = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+            const oeilBarre = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"></path><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.4 0 10 7 10 7a15.8 15.8 0 0 1-3.1 3.8"></path><path d="M6.2 6.2C3.5 8 2 12 2 12s3.6 7 10 7c1.6 0 3-.4 4.2-1"></path><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path></svg>';
+
+            document.querySelectorAll('input[type="password"]').forEach((champ) => {
+                const conteneur = document.createElement('div');
+                conteneur.className = 'champ-mot-de-passe';
+                champ.parentNode.insertBefore(conteneur, champ);
+                conteneur.appendChild(champ);
+
+                const bouton = document.createElement('button');
+                bouton.type = 'button';
+                bouton.className = 'bouton-visibilite-mot-de-passe';
+                bouton.setAttribute('aria-label', 'Afficher le mot de passe');
+                bouton.title = 'Afficher le mot de passe';
+                bouton.innerHTML = oeilOuvert;
+                bouton.addEventListener('click', () => {
+                    const afficher = champ.type === 'password';
+                    champ.type = afficher ? 'text' : 'password';
+                    bouton.setAttribute('aria-pressed', String(afficher));
+                    bouton.setAttribute('aria-label', afficher ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
+                    bouton.title = afficher ? 'Masquer le mot de passe' : 'Afficher le mot de passe';
+                    bouton.innerHTML = afficher ? oeilBarre : oeilOuvert;
+                    champ.focus();
+                });
+                conteneur.appendChild(bouton);
+            });
+
+            const modalDeconnexion = document.getElementById('confirmation-deconnexion');
+            const dialogueDeconnexion = modalDeconnexion?.querySelector('.confirmation-deconnexion-dialogue');
+            const boutonAnnulerDeconnexion = modalDeconnexion?.querySelector('.confirmation-deconnexion-annuler');
+            const boutonConfirmerDeconnexion = modalDeconnexion?.querySelector('.confirmation-deconnexion-confirmer');
+            let formulaireDeconnexionEnAttente = null;
+            let declencheurDeconnexion = null;
+
+            const fermerModalDeconnexion = () => {
+                if (!modalDeconnexion) return;
+                modalDeconnexion.classList.remove('ouvert');
+                modalDeconnexion.setAttribute('aria-hidden', 'true');
+                modalDeconnexion.inert = true;
+                document.body.classList.remove('confirmation-deconnexion-ouverte');
+                formulaireDeconnexionEnAttente = null;
+                window.setTimeout(() => {
+                    if (modalDeconnexion.getAttribute('aria-hidden') === 'true') {
+                        modalDeconnexion.hidden = true;
+                    }
+                }, 180);
+                if (declencheurDeconnexion?.isConnected) declencheurDeconnexion.focus();
+            };
+
+            document.querySelectorAll('.formulaire-deconnexion').forEach((formulaire) => {
+                formulaire.addEventListener('submit', (event) => {
+                    if (formulaire.dataset.deconnexionConfirmee === 'true') {
+                        delete formulaire.dataset.deconnexionConfirmee;
+                        return;
+                    }
+                    event.preventDefault();
+                    if (!modalDeconnexion || !dialogueDeconnexion || !boutonAnnulerDeconnexion) return;
+
+                    formulaireDeconnexionEnAttente = formulaire;
+                    declencheurDeconnexion = formulaire.querySelector('button[type="submit"]');
+                    modalDeconnexion.hidden = false;
+                    modalDeconnexion.inert = false;
+                    modalDeconnexion.setAttribute('aria-hidden', 'false');
+                    document.body.classList.add('confirmation-deconnexion-ouverte');
+                    requestAnimationFrame(() => {
+                        modalDeconnexion.classList.add('ouvert');
+                        boutonAnnulerDeconnexion.focus();
+                    });
+                });
+            });
+
+            boutonAnnulerDeconnexion?.addEventListener('click', fermerModalDeconnexion);
+            modalDeconnexion?.querySelector('.confirmation-deconnexion-fond')
+                ?.addEventListener('click', fermerModalDeconnexion);
+
+            boutonConfirmerDeconnexion?.addEventListener('click', () => {
+                if (!formulaireDeconnexionEnAttente) return;
+                const formulaire = formulaireDeconnexionEnAttente;
+                formulaire.dataset.deconnexionConfirmee = 'true';
+                formulaire.requestSubmit();
+            });
+
+            modalDeconnexion?.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    event.preventDefault();
+                    fermerModalDeconnexion();
+                } else if (event.key === 'Tab') {
+                    const controles = [boutonAnnulerDeconnexion, boutonConfirmerDeconnexion].filter(Boolean);
+                    const index = controles.indexOf(document.activeElement);
+                    if (event.shiftKey && index === 0) {
+                        event.preventDefault();
+                        controles[controles.length - 1].focus();
+                    } else if (!event.shiftKey && index === controles.length - 1) {
+                        event.preventDefault();
+                        controles[0].focus();
+                    }
+                }
+            });
+
+            const boutonPlus = document.querySelector('.navigation-mobile-plus');
+            const panneauPlus = document.querySelector('.mobile-plus-panel');
+            const fondPlus = document.querySelector('.mobile-plus-backdrop');
+            const boutonFermerPlus = document.querySelector('.mobile-plus-fermer');
+
+            if (boutonPlus && panneauPlus && fondPlus && boutonFermerPlus) {
+                const ouvrirPlus = () => {
+                    fondPlus.hidden = false;
+                    panneauPlus.inert = false;
+                    panneauPlus.setAttribute('aria-hidden', 'false');
+                    boutonPlus.setAttribute('aria-expanded', 'true');
+                    document.body.classList.add('mobile-plus-ouvert');
+                    requestAnimationFrame(() => {
+                        panneauPlus.classList.add('ouvert');
+                        fondPlus.classList.add('ouvert');
+                        boutonFermerPlus.focus();
+                    });
+                };
+
+                const fermerPlus = () => {
+                    panneauPlus.classList.remove('ouvert');
+                    fondPlus.classList.remove('ouvert');
+                    panneauPlus.inert = true;
+                    panneauPlus.setAttribute('aria-hidden', 'true');
+                    boutonPlus.setAttribute('aria-expanded', 'false');
+                    document.body.classList.remove('mobile-plus-ouvert');
+                    boutonPlus.focus();
+                    window.setTimeout(() => {
+                        if (!panneauPlus.classList.contains('ouvert')) fondPlus.hidden = true;
+                    }, 240);
+                };
+
+                boutonPlus.addEventListener('click', ouvrirPlus);
+                boutonFermerPlus.addEventListener('click', fermerPlus);
+                fondPlus.addEventListener('click', fermerPlus);
+                document.addEventListener('keydown', (event) => {
+                    if (event.key === 'Escape' && panneauPlus.classList.contains('ouvert')) {
+                        fermerPlus();
+                    }
+                });
+            }
+        })();
+        </script>
+    </body>
+</html>

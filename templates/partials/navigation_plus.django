@@ -1,0 +1,106 @@
+{% with page=request.resolver_match.url_name %}
+   <nav class="navigation" aria-label="Autres fonctionnalités">
+      {% if user.is_superuser %}
+         <a class="navigation-lien{% if page == 'configuration_site' %} actif{% endif %}"
+            href="{% url 'comptes:configuration_site' %}"><span aria-hidden="true">⚙</span> Configuration du site</a>
+         <a class="navigation-lien{% if page == 'notes_evaluation_changelist' %} actif{% endif %}"
+            href="{% url 'admin:notes_evaluation_changelist' %}"><span aria-hidden="true">◉</span> Notes</a>
+         <a class="navigation-lien"
+            href="{% url 'admin:referentiels_programme_changelist' %}"><span aria-hidden="true">▦</span> Programmes et cours</a>
+         <a class="navigation-lien"
+            href="{% url 'admin:comptes_utilisateur_changelist' %}"><span aria-hidden="true">☻</span> Utilisateurs</a>
+         <a class="navigation-lien"
+            href="{% url 'admin:audit_journalaction_changelist' %}"><span aria-hidden="true">⋮</span> Journal d'activite</a>
+         <a class="navigation-lien{% if page == 'calendrier_examens' %} actif{% endif %}"
+            href="{% url 'notes:calendrier_examens' %}"><span aria-hidden="true">▦</span> Calendrier des examens</a>
+         <a class="navigation-lien{% if page == 'gestion_examens' or page == 'modifier_examen' %} actif{% endif %}"
+            href="{% url 'notes:gestion_examens' %}"><span aria-hidden="true">◷</span> Programmer les examens</a>
+         <a class="navigation-lien{% if page == 'regles_academiques' or page == 'modifier_regle_academique' %} actif{% endif %}"
+            href="{% url 'referentiels:regles_academiques' %}"><span aria-hidden="true">⚙</span> Constantes academiques</a>
+         <a class="navigation-lien{% if page == 'paiements_a_verifier' %} actif{% endif %}"
+            href="{% url 'inscriptions:paiements_a_verifier' %}"><span aria-hidden="true">◉</span> Paiements a verifier</a>
+         <a class="navigation-lien{% if page == 'inscriptions_a_traiter' %} actif{% endif %}"
+            href="{% url 'inscriptions:inscriptions_a_traiter' %}"><span aria-hidden="true">☰</span> Inscriptions a traiter</a>
+         <a class="navigation-lien{% if page == 'verifier_dossier' %} actif{% endif %}"
+            href="{% url 'inscriptions:verifier_dossier' %}"><span aria-hidden="true">⌕</span> Verification d'un dossier</a>
+         <a class="navigation-lien{% if page == 'verifier_dossier' %} actif{% endif %}"
+            href="{% url 'inscriptions:verifier_dossier' %}"><span aria-hidden="true">⌕</span> Verification d'un dossier</a>
+         <a class="navigation-lien{% if page == 'notes_a_publier' %} actif{% endif %}"
+            href="{% url 'notes:notes_a_publier' %}"><span aria-hidden="true">◉</span> Notes a publier</a>
+         <a class="navigation-lien{% if page == 'liste_evaluations' %} actif{% endif %}"
+            href="{% url 'notes:liste_evaluations' %}"><span aria-hidden="true">▤</span> Liste des notes</a>
+         <a class="navigation-lien{% if page == 'liste_etudiants' %} actif{% endif %}"
+            href="{% url 'rapports:liste_etudiants' %}"><span aria-hidden="true">☰</span> Listes d'etudiants</a>
+         <a class="navigation-lien{% if page == 'liste_paiements_acquittes' %} actif{% endif %}"
+            href="{% url 'rapports:liste_paiements_acquittes' %}"><span aria-hidden="true">▤</span> Frais acquittes</a>
+         <a class="navigation-lien{% if page == 'releves_etudiants' %} actif{% endif %}"
+            href="{% url 'notes:releves_etudiants' %}"><span aria-hidden="true">▤</span> Releves etudiants</a>
+         <a class="navigation-lien{% if page == 'gestion_dossiers' or page == 'modifier_dossier' %} actif{% endif %}"
+            href="{% url 'rapports:gestion_dossiers' %}"><span aria-hidden="true">▦</span> Dossiers d'etudes</a>
+         <a class="navigation-lien{% if page == 'gestion_actes' %} actif{% endif %}"
+            href="{% url 'rapports:gestion_actes' %}"><span aria-hidden="true">☰</span> Emission des actes</a>
+         <a class="navigation-lien{% if page == 'gestion_soutenances' or page == 'modifier_soutenance' %} actif{% endif %}"
+            href="{% url 'rapports:gestion_soutenances' %}"><span aria-hidden="true">◉</span> Soutenances</a>
+         <a class="navigation-lien{% if page == 'proces_verbaux' %} actif{% endif %}"
+            href="{% url 'rapports:proces_verbaux' %}"><span aria-hidden="true">☰</span> Proces-verbaux</a>
+      {% elif user.role == "personnel" and user.entite_id %}
+         <a class="navigation-lien{% if page == 'notes_a_publier' %} actif{% endif %}"
+            href="{% url 'notes:notes_a_publier' %}"><span aria-hidden="true">◉</span> Notes a publier</a>
+         <a class="navigation-lien{% if page == 'liste_evaluations' %} actif{% endif %}"
+            href="{% url 'notes:liste_evaluations' %}"><span aria-hidden="true">▤</span> Liste des notes</a>
+         <a class="navigation-lien{% if page == 'tableau' %} actif{% endif %}"
+            href="{% url 'rapports:tableau' %}"><span aria-hidden="true">▦</span> Rapports</a>
+         <a class="navigation-lien{% if page == 'calendrier_examens' %} actif{% endif %}"
+            href="{% url 'notes:calendrier_examens' %}"><span aria-hidden="true">▦</span> Calendrier des examens</a>
+         <a class="navigation-lien{% if page == 'gestion_examens' or page == 'modifier_examen' %} actif{% endif %}"
+            href="{% url 'notes:gestion_examens' %}"><span aria-hidden="true">◷</span> Programmer les examens</a>
+         <a class="navigation-lien{% if page == 'regles_academiques' or page == 'modifier_regle_academique' %} actif{% endif %}"
+            href="{% url 'referentiels:regles_academiques' %}"><span aria-hidden="true">⚙</span> Constantes academiques</a>
+         <a class="navigation-lien{% if page == 'liste_etudiants' %} actif{% endif %}"
+            href="{% url 'rapports:liste_etudiants' %}"><span aria-hidden="true">☰</span> Listes d'etudiants</a>
+         <a class="navigation-lien{% if page == 'liste_paiements_acquittes' %} actif{% endif %}"
+            href="{% url 'rapports:liste_paiements_acquittes' %}"><span aria-hidden="true">▤</span> Frais acquittes</a>
+         <a class="navigation-lien{% if page == 'releves_etudiants' %} actif{% endif %}"
+            href="{% url 'notes:releves_etudiants' %}"><span aria-hidden="true">▤</span> Releves etudiants</a>
+         <a class="navigation-lien{% if page == 'gestion_dossiers' or page == 'modifier_dossier' %} actif{% endif %}"
+            href="{% url 'rapports:gestion_dossiers' %}"><span aria-hidden="true">▦</span> Dossiers d'etudes</a>
+         <a class="navigation-lien{% if page == 'gestion_actes' or page == 'acte_imprimable' or page == 'telecharger_acte_pdf' %} actif{% endif %}"
+            href="{% url 'rapports:gestion_actes' %}"><span aria-hidden="true">☰</span> Emission des actes</a>
+         <a class="navigation-lien{% if page == 'gestion_soutenances' or page == 'modifier_soutenance' %} actif{% endif %}"
+            href="{% url 'rapports:gestion_soutenances' %}"><span aria-hidden="true">◉</span> Soutenances</a>
+         <a class="navigation-lien{% if page == 'proces_verbaux' or page == 'proces_verbal_imprimable' or page == 'telecharger_proces_verbal_pdf' %} actif{% endif %}"
+            href="{% url 'rapports:proces_verbaux' %}"><span aria-hidden="true">☰</span> Proces-verbaux</a>
+      {% elif user.role == "professeur" %}
+         <a class="navigation-lien{% if page == 'cours_professeur' or page == 'saisir_evaluation' %} actif{% endif %}"
+            href="{% url 'inscriptions:cours_professeur' %}"><span aria-hidden="true">☰</span> Mes cours et notes</a>
+         <a class="navigation-lien{% if page == 'calendrier_examens' %} actif{% endif %}"
+            href="{% url 'notes:calendrier_examens' %}"><span aria-hidden="true">▦</span> Calendrier des examens</a>
+         <a class="navigation-lien{% if page == 'etudiants_professeur' %} actif{% endif %}"
+            href="{% url 'inscriptions:etudiants_professeur' %}"><span aria-hidden="true">☻</span> Mes etudiants</a>
+      {% elif user.role == "etudiant" %}
+         <a class="navigation-lien{% if page == 'calendrier_examens' %} actif{% endif %}"
+            href="{% url 'notes:calendrier_examens' %}"><span aria-hidden="true">▦</span> Calendrier des examens</a>
+         <a class="navigation-lien{% if page == 'cours_etudiant' %} actif{% endif %}"
+            href="{% url 'inscriptions:cours_etudiant' %}"><span aria-hidden="true">▤</span> Mes cours</a>
+         <a class="navigation-lien{% if page == 'professeurs_etudiant' %} actif{% endif %}"
+            href="{% url 'inscriptions:professeurs_etudiant' %}"><span aria-hidden="true">☻</span> Mes professeurs</a>
+         <a class="navigation-lien{% if page == 'resultats_etudiant' %} actif{% endif %}"
+            href="{% url 'notes:resultats_etudiant' %}"><span aria-hidden="true">▦</span> Mes resultats</a>
+         <a class="navigation-lien{% if page == 'actes_etudiant' or page == 'acte_imprimable' or page == 'telecharger_acte_pdf' %} actif{% endif %}"
+            href="{% url 'rapports:actes_etudiant' %}"><span aria-hidden="true">☰</span> Mes actes</a>
+         <a class="navigation-lien{% if page == 'proces_verbaux' or page == 'proces_verbal_imprimable' or page == 'telecharger_proces_verbal_pdf' %} actif{% endif %}"
+            href="{% url 'rapports:proces_verbaux' %}"><span aria-hidden="true">◉</span> Mes proces-verbaux</a>
+      {% else %}
+         <p class="mobile-plus-vide">Toutes vos rubriques sont deja accessibles dans la barre du bas.</p>
+      {% endif %}
+      <a class="navigation-lien{% if page == 'landing' or page == 'landing_alt' %} actif{% endif %}"
+         href="{% url 'comptes:landing' %}"><span aria-hidden="true">↗</span> Page publique</a>
+      <form method="post"
+            action="{% url 'comptes:deconnexion' %}"
+            class="navigation-formulaire-compte formulaire-deconnexion">
+         {% csrf_token %}
+         <button class="navigation-lien navigation-bouton-compte"
+                 type="submit"><span aria-hidden="true">↪</span> Deconnexion</button>
+      </form>
+   </nav>
+{% endwith %}

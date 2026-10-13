@@ -1,0 +1,55 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Proces-verbaux de soutenance | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Dossier academique</p>
+                    <h1>Proces-verbaux de soutenance</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            {% include "partials/bienvenue.django" with bienvenue_surtitre="DOSSIER ACADEMIQUE" bienvenue_titre="Suivi des soutenances" bienvenue_description="Consultez et filtrez les proces-verbaux disponibles pour votre entite ou votre dossier." %}
+            {% if formulaire %}
+                <section class="section-tableau" style="margin-top: 18px;">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">PERIMETRE</p>
+                            <h2>Filtrer les soutenances</h2>
+                        </div>
+                    </div>
+                    <form method="get"
+                          class="formulaire-connexion"
+                          style="display: grid;
+                                 grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+                                 align-items: end;
+                                 gap: 12px;
+                                 padding: 18px;
+                                 margin: 0">
+                        {% if user.is_superuser %}<label for="{{ formulaire.entite.id_for_label }}">{{ formulaire.entite.label }}{{ formulaire.entite }}</label>{% else %}{{ formulaire.entite }}{% endif %}
+                        <label for="{{ formulaire.periode.id_for_label }}">{{ formulaire.periode.label }}{{ formulaire.periode }}</label>
+                        <label for="{{ formulaire.programme.id_for_label }}">{{ formulaire.programme.label }}{{ formulaire.programme }}</label>
+                        <button class="bouton-principal"
+                                type="submit">Filtrer <span aria-hidden="true">→</span></button>
+                    </form>
+                    {% if formulaire.errors %}<div class="alerte" role="alert">{{ formulaire.errors }}</div>{% endif %}
+                </section>
+            {% endif %}
+            {% if soutenances %}
+                <section class="section-tableau" style="margin-top: 18px;">
+                    <div class="section-entete"><div><p class="surtitre">SOUTENANCES REALISEES</p><h2>{% if user.role == "etudiant" %}Mes proces-verbaux{% else %}Proces-verbaux disponibles{% endif %}</h2></div></div>
+                    <div class="tableau-defilement"><table><thead><tr>{% if user.role != "etudiant" %}<th>Etudiant</th><th>Code</th>{% endif %}<th>Programme</th><th>Periode</th><th>Memoire</th><th>Date</th><th>Note</th><th></th></tr></thead><tbody>
+                        {% for soutenance in soutenances %}<tr>{% if user.role != "etudiant" %}<td><strong>{{ soutenance.etudiant.get_full_name|default:soutenance.etudiant.username }}</strong></td><td>{{ soutenance.etudiant.profil_etudiant.code_etudiant|default:"-" }}</td>{% endif %}<td>{{ soutenance.programme.nom }}</td><td>{{ soutenance.periode.nom }} · {{ soutenance.periode.annee_academique }}</td><td>{{ soutenance.titre }}</td><td>{{ soutenance.date_soutenance|date:"d/m/Y" }}</td><td>{{ soutenance.note|default:"-" }}</td><td><a class="lien-action"
+   href="{% url 'rapports:proces_verbal_imprimable' soutenance.pk %}">Consulter</a> · <a class="lien-action"
+    href="{% url 'rapports:telecharger_proces_verbal_pdf' soutenance.pk %}">PDF</a></td></tr>{% endfor %}
+                        </tbody>
+                        </table>
+                    </div>
+                </section>
+            {% else %}
+                <section class="message-role" role="status"><strong>Aucun proces-verbal disponible.</strong><p>{% if user.role == "etudiant" %}Les soutenances validees apparaitront ici.{% else %}Aucune soutenance realisee ne correspond au perimetre selectionne.{% endif %}</p></section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

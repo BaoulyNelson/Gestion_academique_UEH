@@ -1,0 +1,75 @@
+{% extends "base_admission.html" %} {% block titre %}Mes documents | Admission
+UEH{%endblock %} {% block contenu %}
+<div class="page-formulaire">
+  <p class="sur-titre">ÉTAPE 3 SUR 6</p>
+  <h1>Mes Documents</h1>
+  <p class="texte-intro">
+    Fichiers acceptés : PDF, JPG, JPEG, PNG et WEBP. Taille maximale : 2 Mo par
+    document.
+  </p>
+  {% if documents_manquants %}
+  <div class="alert alert-info">
+    Avant de choisir une entité, téléversez : {{ documents_manquants|join:", "}}.
+  </div>
+  {% endif %}
+  <form
+    method="post"
+    enctype="multipart/form-data"
+    class="formulaire-principal"
+  >
+    {% csrf_token %}{% if formulaire.non_field_errors %}
+    <div class="alert alert-danger">{{ formulaire.non_field_errors }}</div>
+    {% endif %}{% for champ in formulaire %}
+    <div class="mb-3">
+      <label class="form-label" for="{{ champ.id_for_label }}"
+        >{{ champ.label }}</label
+      >{{ champ }}{% for erreur in champ.errors %}
+      <div class="invalid-feedback d-block">{{ erreur }}</div>
+      {% endfor %}
+    </div>
+    {% endfor %}<button type="submit" class="btn btn-primary">
+      Téléverser le document <i class="bi bi-upload"></i>
+    </button>
+  </form>
+  <section class="section-precedentes">
+    <h2 class="h4">Documents téléversés</h2>
+    <div class="table-responsive tableau-dossiers">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Fichier</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for document in documents %}
+          <tr>
+            <td>{{ document.get_type_document_display }}</td>
+            <td>{{ document.fichier.name|slice:"20:" }}</td>
+            <td>{{ document.date_televersement|date:"d/m/Y H:i" }}</td>
+            <td>
+              <a
+                href="{% url 'documents:apercu' document.pk %}"
+                data-apercu-document
+                data-titre-document="{{ document.get_type_document_display }}"
+                data-url-telechargement="{% url 'documents:telecharger' document.pk %}"
+                aria-label="Voir {{ document.get_type_document_display }}"
+                >Voir <i class="bi bi-eye"></i
+              ></a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4" class="texte-vide-tableau">
+              Aucun document téléversé.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+{% endblock %}

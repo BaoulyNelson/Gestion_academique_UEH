@@ -1,0 +1,61 @@
+{% extends "base_gp7.html" %} {% block titre %}Acces refuse | GP7{% endblock %} {% block contenu %}
+<div class="application">
+    <main class="contenu-principal">
+        <header class="entete-page">
+            <div>
+                <p class="fil-ariane">GP7 <span>/</span> Acces securise</p>
+                <h1>Acces refuse</h1>
+            </div>
+        </header>
+        {% if user.is_authenticated %}
+            {% if user.role == "personnel" %}
+                {% if user.entite_id %}
+                    <section class="message-role" role="alert" style="margin-top: 24px">
+                        <strong>Votre compte n'est pas autorise a consulter cette page.</strong>
+                        <p>
+                            Les donnees accessibles dependent de votre role et de votre entite.
+                            Revenez a votre espace de travail ou contactez un administrateur si vous
+                            pensez qu'il s'agit d'une erreur.
+                        </p>
+                        <a class="bouton-principal"
+                           href="{% url 'comptes:tableau_de_bord' %}">Retour au tableau de bord <span aria-hidden="true">→</span></a>
+                    </section>
+                {% endif %}
+                {% if not user.entite_id %}
+                    <section class="message-role" role="alert" style="margin-top: 24px">
+                        <strong>Votre compte Registrariat n'est rattache a aucune entite.</strong>
+                        <p>
+                            Les paiements, inscriptions, notes et rapports sont cloisonnes par
+                            entite. Un superutilisateur doit creer l'entite, puis l'associer a votre
+                            compte dans Administration &gt; Comptes &gt; Utilisateurs. Tant que ce
+                            rattachement manque, ces pages restent bloquees.
+                        </p>
+                        <a class="bouton-principal"
+                           href="{% url 'comptes:tableau_de_bord' %}">Retour au tableau de bord <span aria-hidden="true">→</span></a>
+                    </section>
+                {% endif %}
+            {% endif %}
+            {% if user.role != "personnel" %}
+                <section class="message-role" role="alert" style="margin-top: 24px">
+                    <strong>Votre compte n'est pas autorise a consulter cette page.</strong>
+                    <p>
+                        Les donnees accessibles dependent de votre role et de votre entite.
+                        Revenez a votre espace de travail ou contactez un administrateur si vous
+                        pensez qu'il s'agit d'une erreur.
+                    </p>
+                    <a class="bouton-principal"
+                       href="{% url 'comptes:tableau_de_bord' %}">Retour au tableau de bord <span aria-hidden="true">→</span></a>
+                </section>
+            {% endif %}
+        {% endif %}
+        {% if not user.is_authenticated %}
+            <section class="message-role" role="alert" style="margin-top: 24px">
+                <strong>Votre compte n'est pas autorise a consulter cette page.</strong>
+                <p>Connectez-vous avec un compte autorise ou contactez un administrateur.</p>
+                <a class="bouton-principal"
+                   href="{% url 'comptes:connexion' %}">Se connecter <span aria-hidden="true">→</span></a>
+            </section>
+        {% endif %}
+    </main>
+</div>
+{% endblock %}

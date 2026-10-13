@@ -1,0 +1,39 @@
+{% extends "base_admission.html" %}
+{% load static %}
+{% block titre %}Mon profil | Admission UEH{% endblock %}
+{% block contenu %}
+    <div class="page-formulaire page-formulaire-administration">
+        <p class="sur-titre mt-4">PARAMÈTRES DU COMPTE</p>
+        <h1>Mon profil</h1>
+        <p class="texte-intro">Modifiez vos informations personnelles et votre photo de profil.</p>
+        <form method="post"
+              enctype="multipart/form-data"
+              class="formulaire-principal">
+            {% csrf_token %}
+            <div class="apercu-photo-profil">
+                <span class="avatar-utilisateur avatar-profil">
+                    <span class="avatar-initial">{{ user.prenom|default:"?"|slice:":1"|upper }}</span>
+                    <img class="avatar-photo{% if user.photo_profil %} est-chargee{% endif %}"
+                         {% if user.photo_profil %}src="{% url 'comptes:photo_profil' %}"{% endif %}
+                         data-apercu-photo-profil
+                         alt="Aperçu de la photo de profil" />
+                </span>
+            </div>
+            {% for field in formulaire %}
+                <div class="champ-administration">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                </div>
+            {% endfor %}
+            <div class="actions-formulaire">
+                <a class="btn btn-outline-secondary"
+                   href="{% url 'account_change_password' %}">Changer le mot de passe</a>
+                <button class="btn btn-primary" type="submit">Enregistrer le profil</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script src="{% static 'js/apercu-photo-profil.js' %}" defer></script>
+{% endblock %}

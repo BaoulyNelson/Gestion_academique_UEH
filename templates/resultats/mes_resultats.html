@@ -1,0 +1,185 @@
+{% extends "base_admission.html" %} {% block titre %}Mes résultats | Admission UEH{% endblock %} {% block contenu %}
+<div class="titre-section">
+  <div>
+    <p class="sur-titre">{% if vue_administration %}ESPACE ADMINISTRATEUR{% else %}ESPACE CANDIDAT{% endif %}</p>
+    <h1>{% if vue_administration %}Inscriptions de mon entité{% else %}Mes Résultats{% endif %}</h1>
+  </div>
+  {% if vue_administration %}
+    <a class="btn btn-outline-primary"
+       href="{% url 'administration:export_inscriptions' %}">
+      <i class="bi bi-download"></i> Exporter en CSV
+    </a>
+  {% endif %}
+</div>
+{% if vue_administration %}
+  <div class="table-responsive tableau-dossiers">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Dossier</th>
+          <th>Candidat</th>
+          <th>Option</th>
+          <th>Statut du dossier</th>
+          <th>Résultat</th>
+          <th>Moyenne /100</th>
+          <th>Document</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for inscription in inscriptions %}
+          <tr>
+            <td>
+              #{{ inscription.numero_dossier }}
+              <br>
+              <small>{{ inscription.entite.code }}</small>
+            </td>
+            <td>{{ inscription.candidat.utilisateur.get_full_name|default:inscription.candidat.utilisateur.email }}</td>
+            <td>{{ inscription.option.nom|default:"—" }}</td>
+            <td>{{ inscription.get_statut_display }}</td>
+            <td>
+              {% if inscription.resultat_admin %}
+                {% if inscription.resultat_admin.publie %}
+                  {% if inscription.resultat_admin.admis_calcule %}Admis{% else %}Non admis{% endif %}
+              {% else %}Non publié{% endif %}
+        {% else %}À saisir{% endif %}
+          </td>
+          <td>
+            {% if inscription.resultat_admin %}
+              {{ inscription.resultat_admin.moyenne_calculee|default:inscription.resultat_admin.note|default:"—"|floatformat:2 }}
+        {% else %}—{% endif %}
+          </td>
+          <td class="actions-admin">
+            {% if inscription.resultat_admin %}
+              <a href="{% url 'administration:gerer_resultat' inscription.pk %}"
+                 title="Modifier le résultat"
+                 aria-label="Modifier le résultat du dossier #{{ inscription.numero_dossier }}"><i class="bi bi-clipboard-data"></i></a>
+            {% else %}
+              <a href="{% url 'administration:gerer_resultat' inscription.pk %}"
+                 title="Ajouter un résultat"
+                 aria-label="Ajouter un résultat au dossier #{{ inscription.numero_dossier }}"><i class="bi bi-clipboard-plus"></i></a>
+            {% endif %}
+            <a href="{% url 'administration:modifier_candidat' inscription.pk %}"
+               title="Modifier le dossier complet"
+               aria-label="Modifier le dossier du candidat"><i class="bi bi-person-gear"></i></a>
+            <a href="{% url 'administration:affecter_salle' inscription.pk %}"
+               title="Affecter une salle"
+               aria-label="Affecter une salle au dossier #{{ inscription.numero_dossier }}"><i class="bi bi-door-open"></i></a>
+            <a href="{% url 'administration:liste_salles' %}"
+               title="Créer une salle pour cette entité"
+               aria-label="Créer une salle pour {{ inscription.entite.nom }}"><i class="bi bi-plus-square"></i></a>
+          </td>
+          </tr>
+          {% if inscription.resultat_admin and inscription.resultat_admin.publie and inscription.resultat_admin.epreuves.all %}
+            <tr class="ligne-detail-resultat">
+              <td colspan="7">
+                <div class="table-responsive">
+                  <table class="table table-sm mb-0">
+                    <thead>
+                      <tr>
+                        <th>Épreuve</th>
+                        <th>Note obtenue</th>
+                        <th>Barème</th>
+                        <th>Coefficient</th>
+                        <th>Total pondéré</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for epreuve in inscription.resultat_admin.epreuves.all %}
+                        <tr>
+                          <td>{{ epreuve.nom }}</td>
+                          <td>{{ epreuve.note|floatformat:2 }}</td>
+                          <td>{{ epreuve.bareme|floatformat:2 }}</td>
+                          <td>{{ epreuve.coefficient|floatformat:2 }}</td>
+                          <td>{{ epreuve.note_ponderee|floatformat:2 }}</td>
+                        </tr>
+                      {% endfor %}
+                      <tr>
+                        <th colspan="4">Total pondéré</th>
+                        <td>{{ inscription.resultat_admin.total_pondere|floatformat:2 }} / {{ inscription.resultat_admin.bareme_pondere|floatformat:2 }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          {% endif %}
+        {% empty %}
+          <tr>
+            <td colspan="7" class="texte-vide-tableau">Aucune inscription dans votre entité.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% else %}
+  <div class="table-responsive tableau-dossiers">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Entité</th>
+          <th>Numéro de dossier</th>
+          <th>Résultat</th>
+          <th>Moyenne /100</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for resultat in resultats %}
+          <tr>
+            <td>{{ resultat.inscription.entite.code }} - {{ resultat.inscription.entite.nom }}</td>
+            <td>#{{ resultat.inscription.numero_dossier }}</td>
+            <td>{% if resultat.admis_calcule %}Admis{% else %}Non admis{% endif %}</td>
+            <td>{{ resultat.moyenne_calculee|default:resultat.note|default:"—"|floatformat:2 }}</td>
+            <td>
+              <a class="btn btn-sm btn-outline-primary"
+                 href="{% url 'resultats:imprimer_resultat' resultat.pk %}">
+                <i class="bi bi-printer" aria-hidden="true"></i> Imprimer le ticket
+              </a>
+            </td>
+          </tr>
+          {% with epreuves=resultat.epreuves.all %}
+            {% if epreuves %}
+              <tr class="ligne-detail-resultat">
+                <td colspan="4">
+                  <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                      <thead>
+                        <tr>
+                          <th>Épreuve</th>
+                          <th>Note obtenue</th>
+                          <th>Barème</th>
+                          <th>Coefficient</th>
+                          <th>Total pondéré</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for epreuve in epreuves %}
+                          <tr>
+                            <td>{{ epreuve.nom }}</td>
+                            <td>{{ epreuve.note|floatformat:2 }}</td>
+                            <td>{{ epreuve.bareme|floatformat:2 }}</td>
+                            <td>{{ epreuve.coefficient|floatformat:2 }}</td>
+                            <td>{{ epreuve.note_ponderee|floatformat:2 }}</td>
+                          </tr>
+                        {% endfor %}
+                        <tr>
+                          <th colspan="4">Total pondéré</th>
+                          <td>{{ resultat.total_pondere|floatformat:2 }} / {{ resultat.bareme_pondere|floatformat:2 }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </td>
+              </tr>
+            {% endif %}
+          {% endwith %}
+        {% empty %}
+          <tr>
+            <td colspan="5" class="texte-vide-tableau">Aucun résultat n'a été publié.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+{% endblock %}

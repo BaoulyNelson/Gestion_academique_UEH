@@ -1,0 +1,63 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Verification des paiements | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Registrariat</p>
+                    <h1>Paiements a verifier</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            <section class="bienvenue">
+                <div>
+                    <p class="surtitre">CONTROLE DES FRAIS</p>
+                    <h2>Declarations en attente</h2>
+                    <p>La liste est limitee aux paiements de votre entite.</p>
+                </div>
+                <div class="bienvenue-marque" aria-hidden="true"><span>UEH</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span></div>
+            </section>
+            {% for message in messages %}<div class="alerte" role="status">{{ message }}</div>{% endfor %}
+            {% if paiements %}
+                {% for paiement in paiements %}
+                    <section class="section-tableau" style="margin-top: 18px;">
+                        <div class="section-entete">
+                            <div>
+                                <p class="surtitre">{{ paiement.tarif.programme.entite.nom }} · {{ paiement.tarif.periode.nom }}</p>
+                                <h2>{{ paiement.etudiant.get_full_name|default:paiement.etudiant.username }}</h2>
+                            </div>
+                            <span class="badge-statut">{{ paiement.montant }} {{ paiement.tarif.devise }}</span>
+                        </div>
+                        <div class="etat-vide">
+                            <div>
+                                <strong>{{ paiement.reference }}</strong>
+                                <p>{{ paiement.tarif.programme.nom }} · tarif {{ paiement.tarif.montant }} {{ paiement.tarif.devise }} · versements confirmes {{ paiement.total_deja_confirme }} · reste avant ce versement {{ paiement.reste_a_payer }}</p>
+                            </div>
+                        </div>
+                        <div style="display: flex;
+                                    flex-wrap: wrap;
+                                    gap: 12px;
+                                    padding: 0 22px 18px">
+                            <form method="post"
+                                  action="{% url 'inscriptions:decider_paiement' paiement.id %}">{% csrf_token %}<button class="bouton-principal" name="decision" value="valide" type="submit">Valider le paiement</button></form>
+                            <form method="post"
+                                  action="{% url 'inscriptions:decider_paiement' paiement.id %}">{% csrf_token %}<label for="motif-{{ paiement.id }}">Motif du refus</label><input id="motif-{{ paiement.id }}"
+       name="motif_refus"
+       maxlength="240"
+       required><button class="bouton-secondaire"
+        name="decision"
+        value="refuse"
+        type="submit">Refuser</button></form>
+                        </div>
+                    </section>
+                {% endfor %}
+            {% else %}
+                <section class="message-role" role="status">
+                    <strong>Aucun paiement en attente.</strong>
+                    <p>Les nouvelles declarations de votre entite apparaitront ici.</p>
+                </section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

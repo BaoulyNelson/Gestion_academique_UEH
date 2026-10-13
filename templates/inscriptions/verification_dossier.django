@@ -1,0 +1,209 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Verification d'un dossier | {{ site_config.nom_site }}{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">{{ site_config.nom_site }} <span>/</span> Registrariat</p>
+                    <h1>Verification d'un dossier</h1>
+                </div>
+            </header>
+            <section class="bienvenue">
+                <div>
+                    <p class="surtitre">CONSULTATION SECURISEE</p>
+                    <h2>Retrouver un etudiant</h2>
+                    <p>Consultez les paiements, inscriptions et verifications pour une periode academique.</p>
+                </div>
+                <div class="bienvenue-marque" aria-hidden="true"><span>UEH</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span></div>
+            </section>
+            <section class="section-tableau section-apres">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">RECHERCHE</p>
+                        <h2>Identifiant et periode</h2>
+                    </div>
+                </div>
+                <form method="post" class="formulaire-connexion grille-filtres-liste">
+                    {% csrf_token %}
+                    <label for="{{ formulaire.identifiant.id_for_label }}">
+                        {{ formulaire.identifiant.label }}
+                        {{ formulaire.identifiant }}
+                        {{ formulaire.identifiant.errors }}
+                    </label>
+                    <label for="{{ formulaire.periode.id_for_label }}">
+                        {{ formulaire.periode.label }}
+                        {{ formulaire.periode }}
+                        {{ formulaire.periode.errors }}
+                    </label>
+                    {% for erreur in formulaire.non_field_errors %}<p class="erreur-champ"
+   role="alert">{{ erreur }}</p>{% endfor %}
+                    <button class="bouton-principal"
+                            type="submit">Consulter le dossier <span aria-hidden="true">→</span></button>
+                </form>
+            </section>
+            {% if resultat %}
+                <section class="bienvenue">
+                    <div>
+                        <p class="surtitre">{{ resultat.profil.code_etudiant|default:"IDENTIFIANT NON ATTRIBUE" }}</p>
+                        <h2>{{ resultat.etudiant.get_full_name|default:resultat.etudiant.username }}</h2>
+                        <p>{{ resultat.periode.nom }} · {{ resultat.periode.annee_academique }} · {{ resultat.etudiant.entite.nom }}</p>
+                    </div>
+                    {% if resultat.profil.photo %}
+                        <img class="configuration-logo-apercu"
+                             src="{{ resultat.profil.photo.url }}"
+                             alt="Photo de {{ resultat.etudiant.get_full_name|default:resultat.etudiant.username }}">
+                    {% elif resultat.etudiant.photo_profil %}
+                        <img class="configuration-logo-apercu"
+                             src="{{ resultat.etudiant.photo_profil.url }}"
+                             alt="Photo de {{ resultat.etudiant.get_full_name|default:resultat.etudiant.username }}">
+                    {% endif %}
+                </section>
+                <section class="section-tableau section-apres">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">FRAIS DE SCOLARITE</p>
+                            <h2>Paiements pour la periode</h2>
+                        </div>
+                    </div>
+                    {% if resultat.tarifs %}
+                        <div class="tableau-defilement">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Programme</th>
+                                        <th>Tarif</th>
+                                        <th>Confirme</th>
+                                        <th>En attente</th>
+                                        <th>Etat</th>
+                                        <th>Recus</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for tarif in resultat.tarifs %}
+                                        <tr>
+                                            <td>{{ tarif.programme.nom }}</td>
+                                            <td>{{ tarif.montant }} {{ tarif.devise }}</td>
+                                            <td>{{ tarif.total_confirme }} {{ tarif.devise }}</td>
+                                            <td>{{ tarif.total_en_attente }} {{ tarif.devise }}</td>
+                                            <td>{% if tarif.frais_acquittes %}Acquittes{% else %}Partiels ou non acquittes{% endif %}</td>
+                                            <td>
+                                                {% for paiement in tarif.paiements_valides %}
+                                                    <a href="{% url 'inscriptions:recu_paiement' paiement.pk %}">Recu {{ paiement.reference }}</a>{% if not forloop.last %}<br>{% endif %}
+                                                {% empty %}
+                                                    Aucun recu valide
+                                                {% endfor %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="etat-vide">
+                            <div>
+                                <strong>Aucun tarif configure pour cette periode.</strong>
+                                <p>Les frais ne peuvent pas etre confirmes sans tarif associe.</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </section>
+                <section class="section-tableau section-apres">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">ADMISSIBILITE</p>
+                            <h2>Inscriptions pedagogiques</h2>
+                        </div>
+                    </div>
+                    {% if resultat.inscriptions %}
+                        <div class="tableau-defilement">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Programme</th>
+                                        <th>Inscription</th>
+                                        <th>Resultat academique</th>
+                                        <th>Verification du Registrariat</th>
+                                        <th>Traite par</th>
+                                        <th>Decision</th>
+                                        <th>Fiche</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for inscription in resultat.inscriptions %}
+                                        <tr>
+                                            <td>{{ inscription.programme.nom }}</td>
+                                            <td>{{ inscription.get_statut_display }}</td>
+                                            <td>{{ inscription.statut_passage_academique_display }}</td>
+                                            <td>
+                                                {% if inscription.conditions_passage_verifiees %}
+                                                    Verifiees par le Registrariat
+                                                {% elif inscription.statut == "refusee" %}
+                                                    Non validees
+                                                {% else %}
+                                                    A verifier manuellement
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ inscription.traite_par.get_full_name|default:inscription.traite_par.username|default:"-" }}</td>
+                                            <td>{{ inscription.motif_decision|default:"-" }}</td>
+                                            <td>
+                                                {% if inscription.statut == "validee" and inscription.conditions_passage_verifiees %}
+                                                    <a href="{% url 'inscriptions:fiche_inscription' inscription.pk %}">Imprimer</a>
+                                                {% else %}
+                                                    Apres validation
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="etat-vide">
+                            <div>
+                                <strong>Aucune inscription pour cette periode.</strong>
+                                <p>Les conditions restent a verifier selon le reglement de l'entite avant toute approbation.</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </section>
+                <section class="section-tableau section-apres">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">PARCOURS</p>
+                            <h2>Dossiers d'etudes</h2>
+                        </div>
+                    </div>
+                    {% if resultat.dossiers %}
+                        <div class="tableau-defilement">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Programme</th>
+                                        <th>Statut</th>
+                                        <th>Ouverture</th>
+                                        <th>Cloture</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for dossier in resultat.dossiers %}
+                                        <tr>
+                                            <td>{{ dossier.programme.nom }}</td>
+                                            <td>{{ dossier.get_statut_display }}</td>
+                                            <td>{{ dossier.date_ouverture }}</td>
+                                            <td>{{ dossier.date_cloture|default:"-" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="etat-vide">
+                            <div><strong>Aucun dossier d'etudes enregistre.</strong></div>
+                        </div>
+                    {% endif %}
+                </section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

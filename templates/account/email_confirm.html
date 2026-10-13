@@ -1,0 +1,38 @@
+{% extends "base_admission.html" %}
+{% load static account %}
+{% block titre %}Confirmation de l’adresse e-mail | Admission UEH{% endblock %}
+{% block styles_complementaires %}<link href="{% static 'css/auth.css' %}" rel="stylesheet">{% endblock %}
+{% block contenu %}
+<section class="auth-page">
+    {% if confirmation and can_confirm %}
+        {% user_display confirmation.email_address.user as nom_utilisateur %}
+        <div class="auth-entete">
+            <span class="auth-sceau"><i class="bi bi-envelope-check"></i></span>
+            <p class="sur-titre">ACTIVATION DU COMPTE</p>
+            <h1>Confirmer votre adresse e-mail</h1>
+            <p>Confirmez que <strong>{{ confirmation.email_address.email }}</strong> est l’adresse de {{ nom_utilisateur }}.</p>
+        </div>
+        <form class="formulaire-auth" method="post" action="{% url 'account_confirm_email' confirmation.key %}">
+            {% csrf_token %}
+            {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% endif %}
+            <button class="btn btn-primary bouton-auth" type="submit">Confirmer mon adresse <i class="bi bi-arrow-right"></i></button>
+        </form>
+    {% elif confirmation %}
+        <div class="auth-entete">
+            <span class="auth-sceau auth-sceau-succes"><i class="bi bi-check2"></i></span>
+            <p class="sur-titre">ADRESSE DÉJÀ CONFIRMÉE</p>
+            <h1>Votre adresse est déjà validée</h1>
+            <p>Cette adresse e-mail a déjà été confirmée.</p>
+        </div>
+        <div class="formulaire-auth"><a class="btn btn-primary bouton-auth" href="{% url 'account_login' %}">Se connecter</a></div>
+    {% else %}
+        <div class="auth-entete">
+            <span class="auth-sceau auth-sceau-erreur"><i class="bi bi-exclamation-lg"></i></span>
+            <p class="sur-titre">LIEN NON VALIDE</p>
+            <h1>Ce lien de confirmation a expiré</h1>
+            <p>Connectez-vous pour demander un nouveau message de confirmation.</p>
+        </div>
+        <div class="formulaire-auth"><a class="btn btn-primary bouton-auth" href="{% url 'account_login' %}">Aller à la connexion</a></div>
+    {% endif %}
+</section>
+{% endblock %}

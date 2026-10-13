@@ -1,0 +1,13 @@
+<div class="profil-utilisateur">
+    <span class="avatar-utilisateur" aria-hidden="true">
+        {% if user.photo_profil %}
+            <img src="{{ user.photo_profil.url }}" alt="">
+        {% else %}
+            {{ user.first_name|first|default:user.username|first|upper }}
+        {% endif %}
+    </span>
+    <span class="profil-texte">
+        <strong>{{ user.get_full_name|default:user.username }}</strong>
+        <small>{{ user.get_role_display }}{% if user.entite %} · {{ user.entite.nom }}{% endif %}</small>
+    </span>
+</div>

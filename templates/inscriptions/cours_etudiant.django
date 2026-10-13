@@ -1,0 +1,67 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Mes cours | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Mon parcours</p>
+                    <h1>Mes cours</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            {% include "partials/bienvenue.django" with bienvenue_surtitre="MON PARCOURS" bienvenue_titre="Vos cours et periodes" bienvenue_description="Retrouvez les cours valides pour vos programmes et periodes academiques." %}
+            {% if selections %}
+                <section class="section-tableau section-apres">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">INSCRIPTIONS VALIDEES</p>
+                            <h2>Mes cours selectionnes</h2>
+                        </div>
+                    </div>
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Cours</th>
+                                    <th>Type</th>
+                                    <th>Credits</th>
+                                    <th>Programme</th>
+                                    <th>Periode</th>
+                                    <th>Professeur(s)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for selection in selections %}
+                                    <tr>
+                                        <td><strong>{{ selection.cours.code }}</strong> · {{ selection.cours.nom }}</td>
+                                        <td>{% if selection.cours.est_obligatoire %}Obligatoire{% else %}Optionnel{% endif %}</td>
+                                        <td>{{ selection.cours.credits }}</td>
+                                        <td>{{ selection.inscription.programme.nom }}</td>
+                                        <td>{{ selection.inscription.periode.nom }} · {{ selection.inscription.periode.annee_academique }}</td>
+                                        <td>
+                                            {% if selection.professeurs %}
+                                                {% for professeur in selection.professeurs %}
+                                                    {% if professeur.email %}<a href="mailto:{{ professeur.email }}">{{ professeur.get_full_name|default:professeur.username }}</a>{% else %}{{ professeur.get_full_name|default:professeur.username }}{% endif %}{% if not forloop.last %}<br>{% endif %}
+                                                {% endfor %}
+                                            {% else %}
+                                                Non assigne
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            {% else %}
+                <section class="message-role section-apres" role="status">
+                    <strong>Aucun cours selectionne pour le moment.</strong>
+                    <p>Vos cours apparaitront apres validation de l'inscription et confirmation du choix de cours.</p>
+                    <a class="lien-action"
+                       href="{% url 'inscriptions:inscription_etudiant' %}">Voir mes inscriptions</a>
+                </section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

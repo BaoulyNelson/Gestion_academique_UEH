@@ -1,0 +1,12 @@
+{% extends "base_admission.html" %} {% block titre %}Dossier mis à jour | Admission UEH{%endblock %} {% block contenu %}
+<div class="etat-vide">
+  <i class="bi bi-check-circle"></i>
+  <h1>Action enregistrée</h1>
+  <p>Le dossier #{{ inscription.numero_dossier }} a été mis à jour.</p>
+  <a
+    class="btn btn-primary"
+    href="{% url 'administration:liste_inscriptions' %}"
+    >Retour aux inscriptions</a
+  >
+</div>
+{% endblock %}

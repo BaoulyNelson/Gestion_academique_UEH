@@ -1,0 +1,94 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Releves de notes | GP7{% endblock %}
+{% block contenu %}
+    <style>
+        @media print {
+            .barre-laterale, .navigation-mobile, .entete-page,
+            .bienvenue, .filtres-resultats, .navigation-plus, button { display: none !important; }
+            .contenu-principal { margin: 0; padding: 0; background: #fff; }
+            .section-tableau { break-inside: avoid; }
+        }
+    </style>
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Dossier academique</p>
+                    <h1>{% if etudiant_consulte %}Releve de {{ etudiant_consulte.get_full_name|default:etudiant_consulte.username }}{% elif programme_consulte %}Releves · {{ programme_consulte.nom }}{% else %}Mes resultats{% endif %}</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            <section class="bienvenue">
+                <div>
+                    <p class="surtitre">RELEVES DE NOTES</p>
+                    <h2>{% if periode_precedente %}Notes de la periode precedente{% else %}Resultats publies{% endif %}</h2>
+                    <p>Seules les evaluations officiellement publiees par le registrariat apparaissent ici.</p>
+                </div>
+                <div class="bienvenue-marque" aria-hidden="true"><span>UEH</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span></div>
+            </section>
+            <section class="section-tableau section-apres filtres-resultats">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">PERIODE</p>
+                        <h2>Choisir la periode de reference</h2>
+                    </div>
+                </div>
+                <form method="get" class="formulaire-connexion grille-filtres-liste">
+                    {% if formulaire.etudiant %}<label for="{{ formulaire.etudiant.id_for_label }}">{{ formulaire.etudiant.label }}{{ formulaire.etudiant }}</label>{% endif %}
+                    <label for="{{ formulaire.programme.id_for_label }}">{{ formulaire.programme.label }}{{ formulaire.programme }}</label>
+                    <label for="{{ formulaire.periode_reference.id_for_label }}">{{ formulaire.periode_reference.label }}{{ formulaire.periode_reference }}</label>
+                    {% for erreur in formulaire.non_field_errors %}<p class="alerte"
+   role="alert">{{ erreur }}</p>{% endfor %}
+                    {% for champ in formulaire %}{% for erreur in champ.errors %}<p class="erreur-champ" role="alert">{{ erreur }}</p>{% endfor %}{% endfor %}
+                    <button class="bouton-principal"
+                            type="submit">Afficher le releve <span aria-hidden="true">→</span></button>
+                </form>
+            </section>
+            {% if periode_precedente %}
+                <section class="section-tableau section-apres">
+                    <div class="section-entete">
+                        <div><p class="surtitre">{{ periode_precedente.annee_academique }}</p><h2>{{ periode_precedente.nom }}{% if formulaire.cleaned_data.programme %} · {{ formulaire.cleaned_data.programme.nom }}{% endif %}{% if etudiant_consulte %} · {{ etudiant_consulte.get_full_name|default:etudiant_consulte.username }}{% endif %}</h2></div>
+                        {% if user.role != "etudiant" %}<button class="bouton-principal" type="button" onclick="window.print()">Imprimer le releve <span aria-hidden="true">→</span></button>{% endif %}
+                    </div>
+                </section>
+            {% elif formulaire.is_bound and formulaire.is_valid and formulaire.cleaned_data.periode_reference %}
+                <section class="message-role" role="status">
+                    <strong>Aucune periode precedente n'est configuree pour ce type de periode.</strong>
+                </section>
+            {% endif %}
+            {% if resultats %}
+                {% for resultat in resultats %}
+                    <section class="section-tableau" style="margin-top: 18px;">
+                        <div class="section-entete">
+                            <div>
+                                <p class="surtitre">{{ resultat.periode.annee_academique }} · {{ resultat.periode.nom }}</p>
+                                <h2>{{ resultat.cours.code }} · {{ resultat.cours.nom }}</h2>
+                            </div>
+                            <span class="badge-statut statut-validee">Moyenne {{ resultat.moyenne }}</span>
+                        </div>
+                        <div class="tableau-defilement">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        {% if programme_consulte and not etudiant_consulte %}<th>Etudiant</th>{% endif %}
+                                        <th>Evaluation</th>
+                                        <th>Note</th>
+                                        <th>Coefficient</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for evaluation in resultat.evaluations %}<tr>{% if programme_consulte and not etudiant_consulte %}<td>{{ resultat.etudiant.get_full_name|default:resultat.etudiant.username }}</td>{% endif %}<td><strong>{{ evaluation.libelle }}</strong></td><td>{{ evaluation.note }}/100</td><td>{{ evaluation.coefficient }}</td></tr>{% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                {% endfor %}
+            {% else %}
+                <section class="message-role" role="status">
+                    <strong>Aucun resultat publie.</strong>
+                    <p>Les notes apparaitront ici apres publication officielle.</p>
+                </section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

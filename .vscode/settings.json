@@ -1,0 +1,13 @@
+{
+    "FSharp.suggestGitignore": false,
+    "files.associations": {
+        "**/templates/**/*.django": "django-html",
+        "**/templates/**/*.html": "django-html"
+    },
+    "python.defaultInterpreterPath": "${workspaceFolder}/venv/Scripts/python.exe",
+    "djlint.useVenv": true,
+    "[django-html]": {
+        "editor.defaultFormatter": "monosans.djlint",
+        "editor.formatOnSave": true
+    }
+}

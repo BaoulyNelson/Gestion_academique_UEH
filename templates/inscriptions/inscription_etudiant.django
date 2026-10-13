@@ -1,0 +1,88 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Inscription pedagogique | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Inscriptions</p>
+                    <h1>Inscription pedagogique</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            <section class="bienvenue">
+                <div>
+                    <p class="surtitre">CHOIX DE PROGRAMME</p>
+                    <h2>Demande d'inscription</h2>
+                    <p>Les frais doivent etre entierement valides avant la soumission.</p>
+                </div>
+                <div class="bienvenue-marque" aria-hidden="true"><span>UEH</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span></div>
+            </section>
+            {% for message in messages %}<div class="alerte" role="status">{{ message }}</div>{% endfor %}
+            <section class="section-tableau section-apres">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">NOUVELLE DEMANDE</p>
+                        <h2>Programme et periode</h2>
+                    </div>
+                </div>
+                {% if choix_disponible %}
+                    <form method="post"
+                          class="formulaire-connexion formulaire-inscription-etudiant">
+                        {% csrf_token %}
+                        {{ formulaire.non_field_errors }}
+                        <label for="{{ formulaire.periode.id_for_label }}">{{ formulaire.periode.label }}</label>{{ formulaire.periode }}{{ formulaire.periode.errors }}
+                        <label for="{{ formulaire.programme.id_for_label }}">{{ formulaire.programme.label }}</label>{{ formulaire.programme }}{{ formulaire.programme.errors }}
+                        <button class="bouton-principal"
+                                type="submit">Soumettre ma demande <span aria-hidden="true">→</span></button>
+                    </form>
+                {% else %}
+                    <div class="etat-vide">
+                        <span class="etat-vide-symbole" aria-hidden="true">i</span>
+                        <div>
+                            <strong>Aucun programme ouvert</strong>
+                            <p>Un programme avec un tarif actif et une periode ouverte apparaitra ici. Consultez aussi votre espace de paiement.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+            <section class="section-tableau section-apres">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">SUIVI</p>
+                        <h2>Mes demandes</h2>
+                    </div>
+                </div>
+                {% if inscriptions %}
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Programme</th>
+                                    <th>Periode</th>
+                                    <th>Etat</th>
+                                    <th>Decision</th>
+                                    <th>Fiche</th>
+                                    <th>Cours</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for inscription in inscriptions %}<tr><td><strong>{{ inscription.programme.nom }}</strong></td><td>{{ inscription.periode.nom }} · {{ inscription.periode.annee_academique }}</td><td><span class="badge-statut statut-{{ inscription.statut }}">{{ inscription.get_statut_display }}</span></td><td>{% if inscription.motif_decision %}{{ inscription.motif_decision }}{% elif inscription.date_validation %}Traitee le {{ inscription.date_validation|date:"d/m/Y" }}{% else %}En attente du registrariat{% endif %}</td><td>{% if inscription.statut == "validee" and inscription.conditions_passage_verifiees %}<a class="lien-action"
+   href="{% url 'inscriptions:fiche_inscription' inscription.id %}">Imprimer la fiche</a>{% else %}Apres validation{% endif %}</td><td>{% if inscription.statut == "validee" and inscription.conditions_passage_verifiees %}<a class="lien-action"
+   href="{% url 'inscriptions:choix_cours_etudiant' inscription.id %}">Choisir / modifier</a>{% else %}Apres validation{% endif %}</td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="etat-vide">
+                        <span class="etat-vide-symbole" aria-hidden="true">→</span>
+                        <div>
+                            <strong>Aucune demande soumise</strong>
+                            <p>Apres validation des frais, vous pourrez demander votre inscription.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+{% endblock %}

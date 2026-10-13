@@ -1,0 +1,229 @@
+{% extends "base_admission.html" %} {% block titre %}Mes inscriptions | Admission UEH{%endblock %} {% block contenu %}
+<section class="note-importante" aria-labelledby="titre-note">
+  <div class="note-entete">
+    <i class="bi bi-info-circle-fill"></i>
+    <h1 id="titre-note">Note importante</h1>
+  </div>
+  <ul>
+    <li>
+      Vérifiez l'exactitude des informations personnelles de votre profil avant
+      toute soumission.
+    </li>
+    <li>
+      Préparez vos pièces justificatives dans un format lisible avant de
+      commencer le dossier.
+    </li>
+    <li>Conservez le numéro de dossier affiché après chaque inscription.</li>
+    <li>
+      Consultez régulièrement cet espace pour suivre les mises à jour de votre
+      candidature.
+    </li>
+  </ul>
+  <div class="alerte-paiement">
+    <strong><i class="bi bi-exclamation-triangle-fill"></i> Important</strong
+    ><span
+      >La fiche de paiement ne peut pas être modifiée après son
+      chargement.</span
+    >
+  </div>
+</section>
+<section class="section-inscriptions">
+  <div class="titre-section">
+    <div>
+      <p class="sur-titre">ESPACE CANDIDAT</p>
+      <h1>Mes Inscriptions</h1>
+    </div>
+    <div class="outils-inscriptions">
+      <form method="get" class="filtre-annee">
+        <label class="visually-hidden" for="filtre-annee"
+          >Année académique</label
+        ><select
+          id="filtre-annee"
+          name="annee"
+          class="form-select"
+          onchange="this.form.submit()"
+        >
+          <option value="">Toutes les années</option>
+          {% for annee in annees_academiques %}
+          <option
+            value="{{ annee }}"
+            {%
+            if
+            annee=""
+            ="annee_selectionnee"
+            %}selected{%
+            endif
+            %}
+          >
+            {{ annee }}
+          </option>
+          {% endfor %}
+        </select>
+      </form>
+      {% if nb_total < 3 %}<a
+        class="btn btn-primary"
+        href="{% url 'candidatures:creer' %}"
+        ><i
+          class="bi bi-{% if brouillon_existant %}arrow-repeat{% elif etape_initiale_complete %}plus-lg{% else %}person-vcard{% endif %}"
+        ></i>
+        {% if brouillon_existant %}Reprendre le brouillon{% elif etape_initiale_complete %}Nouvelle Inscription{% else %}Continuer mon
+        dossier{% endif %}</a
+      >{% else %}<button
+        class="btn btn-primary"
+        type="button"
+        disabled
+        title="Limite de trois inscriptions atteinte"
+      >
+        <i class="bi bi-plus-lg"></i> Nouvelle Inscription</button
+      >{% endif %}
+    </div>
+  </div>
+  <div class="grille-statistiques">
+    <article class="statistique">
+      <span class="statistique-icone vert"
+        ><i class="bi bi-check2-circle"></i
+      ></span>
+      <div>
+        <span>Inscriptions validées</span><strong>{{ nb_validees }}</strong>
+      </div>
+    </article>
+    <article class="statistique">
+      <span class="statistique-icone or"
+        ><i class="bi bi-hourglass-split"></i
+      ></span>
+      <div>
+        <span>En attente d'approbation</span><strong>{{ nb_attente }}</strong
+        ><small class="texte-alerte">Révision en cours</small>
+      </div>
+    </article>
+    <article class="statistique">
+      <span class="statistique-icone marine"
+        ><i class="bi bi-collection"></i
+      ></span>
+      <div>
+        <span>Total des inscriptions</span><strong>{{ nb_total }}</strong
+        ><small>Toutes années académiques</small>
+      </div>
+    </article>
+  </div>
+  {% if inscriptions %}
+  <div class="grille-dossiers">
+    {% for inscription in inscriptions %}
+    <article class="carte-dossier">
+      <div class="dossier-entete">
+        <span class="badge-statut statut-{{ inscription.statut|lower }}"
+          >{{ inscription.get_statut_display }}</span
+        >
+        <div class="dossier-annee">
+          <strong>{{ inscription.annee_academique }}</strong
+          ><span
+            >{{ inscription.get_horaire_display|default:"Horaire à déterminer"}}</span
+          >
+        </div>
+      </div>
+      <h2>
+        <span>{{ inscription.entite.code }}</span> - {{ inscription.entite.nom}}
+      </h2>
+      <p class="dossier-option">
+        {{ inscription.option.nom|default:"Aucune option sélectionnée" }}
+      </p>
+      <div class="dossier-infos">
+        <div>
+          <span>Date d'inscription</span
+          ><strong>{{ inscription.date_inscription|date:"d/m/Y" }}</strong>
+        </div>
+        <div>
+          <span>Numéro de dossier</span
+          ><strong class="numero-dossier"
+            >#{{ inscription.numero_dossier }}</strong
+          >
+        </div>
+        <div>
+          <span>Salle assignée</span
+          ><strong
+            >{% if inscription.salle %}{{ inscription.salle.nom }}{% else %}En
+            attente d'affectation{% endif %}</strong
+          >
+        </div>
+        <div>
+          <span>Statut du dossier</span
+          ><strong
+            ><i class="pastille pastille-{{ inscription.statut|lower }}"></i>
+          {{  inscription.get_statut_display }}</strong
+          >
+        </div>
+      </div>
+      <div class="actions-dossier">
+        <a href="{% url 'candidatures:detail' inscription.pk %}"
+          >Voir les détails <i class="bi bi-arrow-up-right"></i></a
+        ><a href="{% url 'candidatures:recu' inscription.pk %}"
+          >Voir le reçu de paiement <i class="bi bi-receipt"></i></a
+        ><a
+          class="btn btn-sm btn-outline-secondary"
+          href="{% url 'candidatures:pdf' inscription.pk %}"
+          ><i class="bi bi-printer"></i> Imprimer PDF</a
+        >
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="etat-vide">
+    <i class="bi bi-folder2-open"></i>
+    <h2>Aucune inscription pour cette année</h2>
+    <p>Vos dossiers apparaîtront ici après leur soumission.</p>
+  </div>
+  {% endif %}
+</section>
+<section class="section-precedentes">
+  <div class="titre-section">
+    <div>
+      <p class="sur-titre">HISTORIQUE</p>
+      <h2>Inscriptions Précédentes</h2>
+    </div>
+  </div>
+  <div class="table-responsive tableau-dossiers">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Entité</th>
+          <th>Année académique</th>
+          <th>Horaire</th>
+          <th>Statut</th>
+          <th>Numéro dossier</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for inscription in inscriptions_precedentes %}
+        <tr>
+          <td>{{ inscription.entite.code }} - {{ inscription.entite.nom }}</td>
+          <td>{{ inscription.annee_academique }}</td>
+          <td>{{ inscription.get_horaire_display|default:"—" }}</td>
+          <td>
+            <span class="badge-statut statut-{{ inscription.statut|lower }}"
+              >{{ inscription.get_statut_display }}</span
+            >
+          </td>
+          <td class="numero-dossier">#{{ inscription.numero_dossier }}</td>
+          <td>
+            <a
+              class="lien-action"
+              href="{% url 'candidatures:detail' inscription.pk %}"
+              aria-label="Voir le dossier #{{ inscription.numero_dossier }}"
+              ><i class="bi bi-eye"></i
+            ></a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="texte-vide-tableau">
+            Aucune inscription précédente.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

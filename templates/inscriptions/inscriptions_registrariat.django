@@ -1,0 +1,60 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Inscriptions a traiter | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Registrariat</p>
+                    <h1>Inscriptions a traiter</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            <section class="bienvenue">
+                <div>
+                    <p class="surtitre">CONTROLE D'ADMISSIBILITE</p>
+                    <h2>Demandes en attente</h2>
+                    <p>Verifiez le paiement et les conditions du reglement de votre entite avant toute approbation.</p>
+                </div>
+                <div class="bienvenue-marque" aria-hidden="true"><span>UEH</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span></div>
+            </section>
+            {% for message in messages %}<div class="alerte" role="status">{{ message }}</div>{% endfor %}
+            {% if inscriptions %}
+                {% for inscription in inscriptions %}
+                    <section class="section-tableau" style="margin-top: 18px;">
+                        <div class="section-entete">
+                            <div>
+                                <p class="surtitre">{{ inscription.programme.entite.nom }} · {{ inscription.periode.nom }}</p>
+                                <h2>{{ inscription.etudiant.get_full_name|default:inscription.etudiant.username }}</h2>
+                            </div>
+                            <span class="badge-statut">En attente</span>
+                        </div>
+                        <div class="etat-vide">
+                            <div>
+                                <strong>{{ inscription.programme.nom }}</strong>
+                                <p>Periode {{ inscription.periode.annee_academique }} · Etudiant {{ inscription.etudiant.username }}</p>
+                            </div>
+                        </div>
+                        <div style="display: flex;
+                                    flex-wrap: wrap;
+                                    gap: 16px;
+                                    padding: 0 22px 20px">
+                            <form method="post"
+                                  action="{% url 'inscriptions:decider_inscription' inscription.id %}">{% csrf_token %}<input type="hidden" name="decision" value="validee"><label><input type="checkbox" name="conditions_passage_verifiees" required> J'ai verifie les conditions de passage du reglement applicable.</label><button class="bouton-principal" type="submit">Approuver l'inscription</button></form>
+                            <form method="post"
+                                  action="{% url 'inscriptions:decider_inscription' inscription.id %}">{% csrf_token %}<input type="hidden" name="decision" value="refusee"><label for="motif-{{ inscription.id }}">Motif du refus</label><input id="motif-{{ inscription.id }}"
+       name="motif_decision"
+       maxlength="240"
+       required><button class="bouton-secondaire" type="submit">Refuser la demande</button></form>
+                        </div>
+                    </section>
+                {% endfor %}
+            {% else %}
+                <section class="message-role" role="status">
+                    <strong>Aucune demande en attente.</strong>
+                    <p>Les demandes de votre entite apparaitront ici.</p>
+                </section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

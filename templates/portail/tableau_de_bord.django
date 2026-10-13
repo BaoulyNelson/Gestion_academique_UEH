@@ -1,0 +1,124 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Tableau de bord | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Tableau de bord</p>
+                    <h1>Vue d'ensemble</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            <section class="bienvenue">
+                <div>
+                    <p class="surtitre">SUIVI ACADEMIQUE</p>
+                    <h2>Bonjour {{ user.first_name|default:user.username }},</h2>
+                    <p>Voici l'activite enregistree dans votre espace.</p>
+                </div>
+                <div class="bienvenue-marque" aria-hidden="true"><span>UEH</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span></div>
+            </section>
+            {% if user.is_superuser or user.role == "personnel" %}
+                <section class="indicateurs" aria-label="Indicateurs academiques">
+                    <article class="indicateur"><span class="indicateur-libelle">Entites</span><strong>{{ nombre_entites }}</strong><span class="indicateur-detail">structures academiques</span></article>
+                    <article class="indicateur indicateur-accent"><span class="indicateur-libelle">Programmes</span><strong>{{ nombre_programmes }}</strong><span class="indicateur-detail">formations referencees</span></article>
+                    <article class="indicateur"><span class="indicateur-libelle">Etudiants</span><strong>{{ nombre_etudiants }}</strong><span class="indicateur-detail">comptes actifs associes</span></article>
+                    <article class="indicateur indicateur-alerte"><span class="indicateur-libelle">Notes a valider</span><strong>{{ nombre_notes_a_valider }}</strong><span class="indicateur-detail">evaluations non publiees</span></article>
+                </section>
+            {% elif user.role == "professeur" %}
+                <section class="indicateurs" aria-label="Resume de mon enseignement">
+                    <article class="indicateur"><span class="indicateur-libelle">Cours affectes</span><strong>{{ nombre_cours_professeur }}</strong><span class="indicateur-detail">cours distincts</span></article>
+                    <article class="indicateur indicateur-accent"><span class="indicateur-libelle">Etudiants inscrits</span><strong>{{ nombre_etudiants }}</strong><span class="indicateur-detail">dans mes cours</span></article>
+                    <article class="indicateur"><span class="indicateur-libelle">Evaluations publiees</span><strong>{{ nombre_notes_publiees }}</strong><span class="indicateur-detail">pour mes cours</span></article>
+                    <article class="indicateur indicateur-alerte"><span class="indicateur-libelle">Evaluations non publiees</span><strong>{{ nombre_notes_a_valider }}</strong><span class="indicateur-detail">saisies dans mes cours</span></article>
+                </section>
+            {% elif user.role == "etudiant" %}
+                <section class="indicateurs" aria-label="Resume de mon dossier">
+                    <article class="indicateur"><span class="indicateur-libelle">Mon entite</span><strong>{{ nombre_entites }}</strong><span class="indicateur-detail">entite de rattachement</span></article>
+                    <article class="indicateur indicateur-accent"><span class="indicateur-libelle">Mes programmes</span><strong>{{ nombre_programmes }}</strong><span class="indicateur-detail">formations avec inscription</span></article>
+                    <article class="indicateur"><span class="indicateur-libelle">Mes inscriptions</span><strong>{{ nombre_inscriptions }}</strong><span class="indicateur-detail">inscriptions enregistrees</span></article>
+                    <article class="indicateur indicateur-alerte"><span class="indicateur-libelle">Mes notes publiees</span><strong>{{ nombre_notes_publiees }}</strong><span class="indicateur-detail">resultats accessibles</span></article>
+                </section>
+            {% else %}
+                <section class="message-role" role="status">
+                    <strong>Aucun cours n'est encore associe a votre compte.</strong>
+                    <p>Les donnees de cours seront visibles apres leur affectation a votre profil.</p>
+                </section>
+            {% endif %}
+            <div class="grille-contenu">
+                {% if user.is_superuser or user.role == "personnel" or user.role == "etudiant" %}
+                    <section class="section-tableau">
+                        <div class="section-entete"><div><p class="surtitre">DERNIERES OPERATIONS</p><h2>{% if user.role == "etudiant" %}Mes inscriptions recentes{% else %}Inscriptions recentes{% endif %}</h2></div>
+                            {% if user.is_superuser %}<a class="lien-action"
+   href="{% url 'admin:inscriptions_inscriptionpedagogique_changelist' %}">Tout voir <span aria-hidden="true">→</span></a>{% endif %}
+                        </div>
+                        {% if activite_recente %}
+                            <div class="tableau-defilement">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Etudiant</th>
+                                            <th>Programme</th>
+                                            <th>Periode</th>
+                                            <th>Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for inscription in activite_recente %}<tr><td><strong>{{ inscription.etudiant.get_full_name|default:inscription.etudiant.username }}</strong></td><td>{{ inscription.programme.nom }}</td><td>{{ inscription.periode.nom }}</td><td><span class="badge-statut statut-{{ inscription.statut }}">{{ inscription.get_statut_display }}</span></td></tr>{% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="etat-vide">
+                                <span class="etat-vide-symbole" aria-hidden="true">→</span>
+                                <div>
+                                    <strong>Aucune inscription pour le moment</strong>
+                                    <p>Les nouvelles inscriptions apparaitront ici apres leur enregistrement.</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </section>
+                {% endif %}
+                <aside class="panneau-lateral">
+                    <p class="surtitre">ACCES RAPIDE</p><h2>{% if user.is_superuser or user.role == "personnel" %}Gestion du systeme{% elif user.role == "professeur" %}Enseignement{% else %}Mes demarches{% endif %}</h2>
+                    {% if user.is_superuser %}
+                        <a class="raccourci"
+                           href="{% url 'admin:referentiels_entite_changelist' %}"><span class="raccourci-icone">01</span><span><strong>Referentiels</strong><small>Entites, programmes et periodes</small></span><b aria-hidden="true">→</b></a>
+                        <a class="raccourci"
+                           href="{% url 'admin:notes_evaluation_changelist' %}"><span class="raccourci-icone raccourci-corail">02</span><span><strong>Evaluations</strong><small>Saisie et publication des notes</small></span><b aria-hidden="true">→</b></a>
+                        <a class="raccourci"
+                           href="{% url 'admin:comptes_utilisateur_changelist' %}"><span class="raccourci-icone raccourci-jaune">03</span><span><strong>Comptes</strong><small>Roles et rattachement par entite</small></span><b aria-hidden="true">→</b></a>
+                    {% elif user.role == "professeur" %}
+                        <a class="raccourci" href="{% url 'inscriptions:cours_professeur' %}"><span class="raccourci-icone">01</span><span><strong>Mes cours</strong><small>Affectations et saisie des evaluations</small></span><b aria-hidden="true">→</b></a>
+                        <a class="raccourci"
+                           href="{% url 'inscriptions:etudiants_professeur' %}"><span class="raccourci-icone raccourci-corail">02</span><span><strong>Mes etudiants</strong><small>Consulter et imprimer les listes de classe</small></span><b aria-hidden="true">→</b></a>
+                    {% elif user.role == "etudiant" %}
+                        <a class="raccourci" href="{% url 'inscriptions:paiement_etudiant' %}"><span class="raccourci-icone">01</span><span><strong>Mes paiements</strong><small>Declarer un versement et telecharger les recus valides</small></span><b aria-hidden="true">→</b></a>
+                        <a class="raccourci"
+                           href="{% url 'inscriptions:inscription_etudiant' %}"><span class="raccourci-icone raccourci-corail">02</span><span><strong>Inscription pedagogique</strong><small>Suivre mes demandes et choisir mes cours</small></span><b aria-hidden="true">→</b></a>
+                        <a class="raccourci" href="{% url 'notes:resultats_etudiant' %}"><span class="raccourci-icone raccourci-jaune">03</span><span><strong>Mes resultats</strong><small>Notes publiees par le Registrariat</small></span><b aria-hidden="true">→</b></a>
+                        <a class="raccourci" href="{% url 'rapports:actes_etudiant' %}"><span class="raccourci-icone">04</span><span><strong>Mes actes et proces-verbaux</strong><small>Documents academiques disponibles</small></span><b aria-hidden="true">→</b></a>
+                    {% elif user.role == "personnel" %}
+                        <a class="raccourci"
+                           href="{% url 'inscriptions:paiements_a_verifier' %}"><span class="raccourci-icone">01</span><span><strong>Paiements a verifier</strong><small>Traitement des versements de mon entite</small></span><b aria-hidden="true">→</b></a>
+                        <a class="raccourci"
+                           href="{% url 'inscriptions:inscriptions_a_traiter' %}"><span class="raccourci-icone raccourci-corail">02</span><span><strong>Inscriptions a traiter</strong><small>Verification de l'admissibilite</small></span><b aria-hidden="true">→</b></a>
+                        <a class="raccourci" href="{% url 'notes:notes_a_publier' %}"><span class="raccourci-icone raccourci-jaune">03</span><span><strong>Notes a publier</strong><small>Diffusion des resultats verifies</small></span><b aria-hidden="true">→</b></a>
+                        <a class="raccourci" href="{% url 'rapports:gestion_dossiers' %}"><span class="raccourci-icone">04</span><span><strong>Dossiers d'etudes</strong><small>Ouverture, cloture et suivi des parcours</small></span><b aria-hidden="true">→</b></a>
+                        <a class="raccourci" href="{% url 'rapports:liste_etudiants' %}"><span class="raccourci-icone raccourci-jaune">05</span><span><strong>Listes d'etudiants</strong><small>Impression par programme, periode ou cours</small></span><b aria-hidden="true">→</b></a>
+                        <a class="raccourci" href="{% url 'rapports:gestion_actes' %}"><span class="raccourci-icone raccourci-corail">06</span><span><strong>Actes et soutenances</strong><small>Emission des actes et suivi des PV</small></span><b aria-hidden="true">→</b></a>
+                    {% else %}
+                        <p class="texte-secondaire">Les donnees disponibles dependront de votre role et de votre entite.</p>
+                    {% endif %}
+                    <div class="note-regles">
+                        <span aria-hidden="true">i</span>
+                        <p>Les regles academiques sont associees a leur entite et a leur version de reglement.</p>
+                    </div>
+                </aside>
+            </div>
+            <footer class="pied-page">
+                <span>GP7 · Gestion academique</span><span>Acces securise · {{ user.entite.nom|default:"Vue globale" }}</span>
+            </footer>
+        </main>
+    </div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends "base_gp7.html" %}
+
+{% block titre %}{{ acte.get_type_acte_display }} | GP7{% endblock %}
+
+{% block contenu %}
+<style>
+    .acte-impression { width: min(100%, 820px); min-height: 760px; margin: 30px auto; padding: clamp(24px, 6vw, 62px); border: 1px solid #d7ddd7; background: #fff; }
+    .acte-entete { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-bottom: 20px; border-bottom: 2px solid #1c493d; }
+    .acte-entete h1 { margin: 0; color: #1c493d; font-family: Georgia, serif; font-size: 20px; font-weight: 400; }
+    .acte-entete p, .acte-reference { margin: 5px 0 0; color: #53615b; font-size: 10px; }
+    .acte-titre { margin: 56px 0 34px; text-align: center; }
+    .acte-titre p { margin: 0 0 8px; color: #d25b45; font-size: 10px; font-weight: 800; letter-spacing: 1.5px; }
+    .acte-titre h2 { margin: 0; font-family: Georgia, serif; font-size: 28px; font-weight: 400; }
+    .acte-corps { color: #202c29; font-family: Georgia, serif; font-size: 17px; line-height: 1.9; }
+    .acte-corps strong { color: #15372f; }
+    .acte-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 26px; margin-top: 38px; padding: 18px 0; border-top: 1px solid #e3e8e2; border-bottom: 1px solid #e3e8e2; }
+    .acte-meta span { display: block; color: #718078; font-size: 9px; text-transform: uppercase; }
+    .acte-meta strong { display: block; margin-top: 5px; font-size: 12px; }
+    .acte-signature { margin: 70px 0 0 auto; width: 220px; min-height: 95px; padding-top: 10px; border-top: 1px solid #53615b; text-align: center; font-size: 10px; }
+    .acte-signature small { display: block; margin-top: 38px; color: #53615b; }
+    .acte-actions { display: flex; justify-content: flex-end; gap: 10px; max-width: 820px; margin: 0 auto 30px; }
+    @media print { body { background: #fff; } .barre-laterale, .entete-page, .acte-actions { display: none !important; } .contenu-principal { margin: 0; padding: 0; background: #fff; } .acte-impression { width: 100%; min-height: 0; margin: 0; padding: 18mm; border: 0; } }
+    @media (max-width: 560px) { .acte-meta { grid-template-columns: 1fr; } .acte-titre { margin-top: 34px; } .acte-corps { font-size: 15px; } }
+</style>
+<main class="contenu-principal">
+    <header class="entete-page"><div><p class="fil-ariane">GP7 <span>/</span> Mes actes</p><h1>{{ acte.get_type_acte_display }}</h1></div><span class="profil-texte"><strong>{{ user.get_full_name|default:user.username }}</strong><small>Document officiel non annule</small></span></header>
+    <article class="acte-impression">
+        <div class="acte-entete"><div><h1>UNIVERSITE D'ETAT D'HAITI</h1><p>{{ acte.programme.entite.nom }}</p></div><div class="acte-reference">Reference officielle<br><strong>{{ acte.reference }}</strong></div></div>
+        <div class="acte-titre"><p>ACTE ACADEMIQUE</p><h2>{{ acte.get_type_acte_display }}</h2></div>
+        <div class="acte-corps">
+            {% if acte.type_acte == "attestation_inscription" %}
+            Le Registrariat atteste que <strong>{{ acte.etudiant.get_full_name|default:acte.etudiant.username }}</strong> est inscrit au programme <strong>{{ acte.programme.nom }}</strong> pour la periode <strong>{{ acte.periode.nom }} {{ acte.periode.annee_academique }}</strong>. L'inscription pedagogique correspondante a ete validee par l'entite.
+            {% elif acte.type_acte == "attestation_etudes" %}
+            Le Registrariat atteste que le dossier academique de <strong>{{ acte.etudiant.get_full_name|default:acte.etudiant.username }}</strong> comporte des resultats publies au programme <strong>{{ acte.programme.nom }}</strong> pour la periode <strong>{{ acte.periode.nom }} {{ acte.periode.annee_academique }}</strong>.
+            {% elif acte.type_acte == "certificat" %}
+            Le present certificat est delivre a <strong>{{ acte.etudiant.get_full_name|default:acte.etudiant.username }}</strong> et concerne son dossier d'etudes au programme <strong>{{ acte.programme.nom }}</strong>, pour la periode <strong>{{ acte.periode.nom }} {{ acte.periode.annee_academique }}</strong>.
+            {% elif acte.type_acte == "diplome" %}
+            Le Registrariat certifie que le dossier d'etudes de <strong>{{ acte.etudiant.get_full_name|default:acte.etudiant.username }}</strong> au programme <strong>{{ acte.programme.nom }}</strong> a ete reconnu au statut diplome par l'entite. Le present acte est delivre sous reserve des reglements academiques applicables.
+            {% else %}
+            Le present releve concerne les resultats publies de <strong>{{ acte.etudiant.get_full_name|default:acte.etudiant.username }}</strong> au programme <strong>{{ acte.programme.nom }}</strong> pour la periode <strong>{{ acte.periode.nom }} {{ acte.periode.annee_academique }}</strong>. Seules les notes publiees par le Registrariat sont reproduites ci-dessous.
+            {% endif %}
+        </div>
+        {% if acte.type_acte == "releve_notes" %}
+        <h2 class="surtitre">RESULTATS PUBLIES</h2>
+        {% if resultats %}
+        {% for resultat in resultats %}
+        <section style="margin: 14px 0;">
+            <div class="section-entete"><strong>{{ resultat.cours.code }} · {{ resultat.cours.nom }}</strong><span class="badge-statut statut-validee">Moyenne {{ resultat.moyenne }}/100</span></div>
+            <div class="tableau-defilement"><table><thead><tr><th>Evaluation</th><th>Note / 100</th><th>Coefficient</th></tr></thead><tbody>
+                {% for evaluation in resultat.evaluations %}<tr><td>{{ evaluation.libelle }}</td><td>{{ evaluation.note }}</td><td>{{ evaluation.coefficient }}</td></tr>{% endfor %}
+            </tbody></table></div>
+        </section>
+        {% endfor %}
+        {% else %}
+        <p>Aucun resultat publie pour cette periode.</p>
+        {% endif %}
+        {% endif %}
+        <div class="acte-meta"><div><span>Etudiant</span><strong>{{ acte.etudiant.get_full_name|default:acte.etudiant.username }}</strong></div><div><span>Code etudiant</span><strong>{{ acte.etudiant.profil_etudiant.code_etudiant|default:"A renseigner" }}</strong></div><div><span>Programme</span><strong>{{ acte.programme.nom }}</strong></div><div><span>Periode</span><strong>{{ acte.periode.nom }} · {{ acte.periode.annee_academique }}</strong></div><div><span>Delivre le</span><strong>{{ acte.date_delivrance|date:"d/m/Y" }}</strong></div><div><span>Reference</span><strong>{{ acte.reference }}</strong></div></div>
+        <div class="acte-signature">Pour le Registrariat<br><strong>{{ acte.delivre_par.get_full_name|default:acte.delivre_par.username }}</strong><small>Signature et sceau</small></div>
+    </article>
+    <div class="acte-actions"><a class="bouton-secondaire" href="{% url retour_url %}">Retour</a><button class="bouton-secondaire" type="button" onclick="window.print()">Imprimer <span aria-hidden="true">&#8594;</span></button><a class="bouton-principal" href="{% url 'rapports:telecharger_acte_pdf' acte.pk %}">Telecharger le PDF <span aria-hidden="true">&#8595;</span></a></div>
+</main>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Saisie des notes | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> {{ cours.programme.nom }}</p>
+                    <h1>Saisie des notes</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            <section class="bienvenue">
+                <div>
+                    <p class="surtitre">{{ periode.nom }} · {{ periode.annee_academique }}</p>
+                    <h2>{{ cours.code }} · {{ cours.nom }}</h2>
+                    <p>Les resultats saisis restent confidentiels jusqu'a leur publication par le registrariat.</p>
+                </div>
+                <div class="bienvenue-marque" aria-hidden="true"><span>UEH</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span></div>
+            </section>
+            {% for message in messages %}<div class="alerte" role="status">{{ message }}</div>{% endfor %}
+            <section class="section-tableau" style="margin-top: 18px;">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">NOUVELLE EVALUATION</p>
+                        <h2>Ajouter ou corriger une note</h2>
+                    </div>
+                </div>
+                <form method="post"
+                      class="formulaire-connexion"
+                      style="padding: 22px;
+                             margin: 0">
+                    {% csrf_token %}
+                    {{ formulaire.non_field_errors }}
+                    <label for="{{ formulaire.etudiant.id_for_label }}">{{ formulaire.etudiant.label }}</label>{{ formulaire.etudiant }}{{ formulaire.etudiant.errors }}
+                    <label for="{{ formulaire.libelle.id_for_label }}">{{ formulaire.libelle.label }}</label>{{ formulaire.libelle }}{{ formulaire.libelle.errors }}
+                    <p class="texte-secondaire">{{ formulaire.libelle.help_text }}</p>
+                    <label for="{{ formulaire.note.id_for_label }}">{{ formulaire.note.label }}</label>{{ formulaire.note }}{{ formulaire.note.errors }}
+                    <label for="{{ formulaire.coefficient.id_for_label }}">{{ formulaire.coefficient.label }}</label>{{ formulaire.coefficient }}{{ formulaire.coefficient.errors }}
+                    <button class="bouton-principal"
+                            type="submit">Enregistrer la note <span aria-hidden="true">→</span></button>
+                </form>
+            </section>
+            <section class="section-tableau" style="margin-top: 18px;">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">IMPORT EN LOT</p>
+                        <h2>Importer les notes depuis Excel</h2>
+                    </div>
+                </div>
+                <form method="post"
+                      enctype="multipart/form-data"
+                      action="{% url 'notes:importer_evaluations_excel' cours.pk periode.pk %}"
+                      class="formulaire-connexion"
+                      style="max-width: 560px;
+                             padding: 22px;
+                             margin: 0">
+                    {% csrf_token %}
+                    <label for="id_fichier">Fichier Excel (.xlsx)</label>
+                    <input id="id_fichier" name="fichier" type="file" accept=".xlsx" required>
+                    <p class="texte-secondaire">Colonnes, dans cet ordre: code_etudiant, evaluation, note, coefficient. Une ligne par note; 5 Mo et 5 000 lignes maximum.</p>
+                    <button class="bouton-principal"
+                            type="submit">Importer les notes <span aria-hidden="true">→</span></button>
+                </form>
+            </section>
+            <section class="section-tableau" id="notes" style="margin-top: 18px;">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">DOSSIER DE LA PERIODE</p>
+                        <h2>Evaluations deja saisies</h2>
+                    </div>
+                </div>
+                {% if evaluations %}
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Etudiant</th>
+                                    <th>Evaluation</th>
+                                    <th>Note</th>
+                                    <th>Coefficient</th>
+                                    <th>Moyenne ponderee</th>
+                                    <th>Publication</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for evaluation in evaluations %}<tr><td><strong>{{ evaluation.etudiant.get_full_name|default:evaluation.etudiant.username }}</strong></td><td>{{ evaluation.libelle }}</td><td>{{ evaluation.note }}</td><td>{{ evaluation.coefficient }}</td><td>{{ evaluation.moyenne_cours|default:"-" }}</td><td><span class="badge-statut {% if evaluation.est_publiee %}statut-validee{% endif %}">{% if evaluation.est_publiee %}Publiee{% else %}Confidentielle{% endif %}</span></td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="etat-vide">
+                        <span class="etat-vide-symbole" aria-hidden="true">→</span>
+                        <div>
+                            <strong>Aucune note saisie</strong>
+                            <p>Les evaluations de ce cours apparaitront ici.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+{% endblock %}

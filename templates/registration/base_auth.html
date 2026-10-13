@@ -1,0 +1,22 @@
+{% extends "base_gp7.html" %}
+{% block contenu %}
+    <main class="connexion-page">
+        <section class="connexion-marque" aria-label="GP7, gestion academique">
+            <a class="marque" href="{% url 'comptes:connexion' %}">
+                <span class="marque-symbole" aria-hidden="true">G</span>
+                <span>GP7 <small>REGISTRARIAT</small></span>
+            </a>
+            <div class="connexion-intro">
+                <p class="surtitre">UNIVERSITE · DOSSIERS · PARCOURS</p>
+                <h1>Un acces securise a votre parcours academique.</h1>
+                <p>Recevez un lien personnel pour definir un nouveau mot de passe.</p>
+            </div>
+            <span class="connexion-edition">SYSTEME DE GESTION ACADEMIQUE</span>
+        </section>
+        <section class="connexion-formulaire">
+            <div class="connexion-formulaire-interieur">
+                {% block contenu_auth %}{% endblock %}
+            </div>
+        </section>
+    </main>
+{% endblock %}

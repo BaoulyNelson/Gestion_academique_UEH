@@ -1,0 +1,128 @@
+{% extends "base_admission.html" %} {% load static %} {% block titre %}Nouvelle
+inscription | Admission UEH{% endblock %} {% block contenu %}
+<div class="page-formulaire">
+  <a class="retour-page" href="{% url 'tableau_bord:mes_inscriptions' %}"
+    ><i class="bi bi-arrow-left"></i> Mes inscriptions</a
+  >
+  <p class="sur-titre mt-4">ÉTAPE 4 SUR 6</p>
+  <h1>Nouvelle inscription</h1>
+  <p class="texte-intro">
+    Choisissez l'entité et le concours auquel vous souhaitez participer.
+  </p>
+  <form
+    method="post"
+    enctype="multipart/form-data"
+    class="formulaire-principal formulaire-inscription"
+    data-url-choix="{% url 'candidatures:choix_entite' %}"
+    data-url-brouillon="{% url 'candidatures:sauvegarder_brouillon' %}"
+  >
+    {% csrf_token %}{% if formulaire.non_field_errors %}
+    <div class="alert alert-danger">{{ formulaire.non_field_errors }}</div>
+    {% endif %}
+    <div class="alert alert-warning" role="note">
+      <strong>Important : vérification des paiements</strong>
+      <p class="mb-1">Pour que votre inscription soit validée, veillez à :</p>
+      <ul class="mb-0">
+        <li>
+          bien saisir les informations figurant sur la fiche de paiement (Seq,
+          Till) ;
+        </li>
+        <li>ne pas utiliser une fiche déjà utilisée pour une autre entité ;</li>
+        <li>téléverser une fiche de paiement à votre nom.</li>
+      </ul>
+    </div>
+    <section class="section-formulaire-inscription">
+      <h2>Informations d’Inscription</h2>
+      <div class="row">
+        {% include "candidatures/_champ.html" with champ=formulaire.annee_academique %}
+        <div class="col-md-6 mb-3">
+          <label class="form-label" for="annee-inscription"
+            >Année d’Inscription</label
+          >
+          <input
+            id="annee-inscription"
+            class="form-control"
+            value="{{ date_inscription|date:'Y' }}"
+            readonly
+          />
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label" for="date-inscription"
+            >Date d’Inscription</label
+          >
+          <input
+            id="date-inscription"
+            class="form-control"
+            type="date"
+            value="{{ date_inscription|date:'Y-m-d' }}"
+            readonly
+          />
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label" for="numero-dossier-prevu"
+            >No Dossier</label
+          >
+          <input
+            id="numero-dossier-prevu"
+            class="form-control"
+            value="{{ numero_dossier_prevu }}"
+            readonly
+          />
+          <div class="form-text">Numéro généré automatiquement.</div>
+        </div>
+      </div>
+    </section>
+    <section class="section-formulaire-inscription">
+      <h2>Informations sur l’Entité</h2>
+      <div class="alert alert-info py-2" role="note">
+        Seules les entités ayant leurs inscriptions ouvertes sont affichées.
+      </div>
+      <div class="row">
+        {% include "candidatures/_champ.html" with champ=formulaire.entite %} 
+        {% include "candidatures/_champ.html" with champ=formulaire.option %} 
+        {% include "candidatures/_champ.html" with champ=formulaire.horaire %}
+      </div>
+    </section>
+    <section class="section-formulaire-inscription">
+      <h2>Informations de Paiement Bancaire</h2>
+      <div class="alert alert-warning py-2" role="note">
+        Saisissez les références Seq et Till indiquées sur votre fiche de
+        paiement.
+      </div>
+      <div class="row">
+        {% include "candidatures/_champ.html" with champ=formulaire.seq %} 
+        {% include "candidatures/_champ.html" with champ=formulaire.till %} 
+        {% include "candidatures/_champ.html" with champ=formulaire.date_depot %}
+        {% include "candidatures/_champ.html" with champ=formulaire.recu_paiement %}
+      </div>
+      {% if brouillon.recu_paiement %}
+      <p class="form-text">
+        Un reçu est déjà enregistré dans ce brouillon. Téléversez-en un nouveau
+        pour le remplacer.
+      </p>
+      {% endif %}
+    </section>
+    <p id="etat-brouillon" class="form-text" role="status" aria-live="polite">
+      Vos modifications sont enregistrées automatiquement.
+    </p>
+    <div class="actions-formulaire">
+      <a
+        class="btn btn-outline-secondary"
+        href="{% url 'tableau_bord:mes_inscriptions' %}"
+        >Annuler</a
+      ><button
+        class="btn btn-outline-secondary"
+        type="submit"
+        name="action"
+        value="brouillon"
+      >
+        Enregistrer pour plus tard</button
+      ><button class="btn btn-primary" type="submit">
+        Ajouter une inscription <i class="bi bi-arrow-right"></i>
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %} {% block scripts %}
+<script src="{% static 'js/candidature.js' %}" defer></script>
+{% endblock %}

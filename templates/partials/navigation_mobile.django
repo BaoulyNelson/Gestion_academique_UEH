@@ -1,0 +1,103 @@
+{% with page=request.resolver_match.url_name %}
+    <nav class="navigation-mobile" aria-label="Navigation mobile">
+        <a class="navigation-mobile-lien{% if page == 'tableau_de_bord' %} actif{% endif %}"
+           href="{% url 'comptes:tableau_de_bord' %}"
+           {% if page == 'tableau_de_bord' %} aria-current="page"{% endif %}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" />
+            </svg>
+            <span>Accueil</span>
+        </a>
+        {% if user.is_superuser %}
+            <a class="navigation-mobile-lien{% if page == 'inscriptions_inscriptionpedagogique_changelist' %} actif{% endif %}"
+               href="{% url 'admin:inscriptions_inscriptionpedagogique_changelist' %}">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+                </svg>
+                <span>Inscriptions</span>
+            </a>
+            <a class="navigation-mobile-lien{% if page == 'tableau' %} actif{% endif %}"
+               href="{% url 'rapports:tableau' %}">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 3h8v8H3zM13 3h8v5h-8zM13 10h8v11h-8zM3 13h8v8H3z" />
+                </svg>
+                <span>Rapports</span>
+            </a>
+        {% elif user.role == "personnel" %}
+            {% if user.entite_id %}
+                <a class="navigation-mobile-lien{% if page == 'paiements_a_verifier' %} actif{% endif %}"
+                   href="{% url 'inscriptions:paiements_a_verifier' %}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 6h18v12H3zM3 10h18M7 15h4" />
+                    </svg>
+                    <span>Paiements</span>
+                </a>
+                <a class="navigation-mobile-lien{% if page == 'inscriptions_a_traiter' %} actif{% endif %}"
+                   href="{% url 'inscriptions:inscriptions_a_traiter' %}">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+                    </svg>
+                    <span>Inscriptions</span>
+                </a>
+            {% else %}
+            {% endif %}
+        {% elif user.role == "etudiant" %}
+            <a class="navigation-mobile-lien{% if page == 'paiement_etudiant' or page == 'recu_paiement' %} actif{% endif %}"
+               href="{% url 'inscriptions:paiement_etudiant' %}">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 6h18v12H3zM3 10h18M7 15h4" />
+                </svg>
+                <span>Paiements</span>
+            </a>
+            <a class="navigation-mobile-lien{% if page == 'inscription_etudiant' or page == 'choix_cours_etudiant' %} actif{% endif %}"
+               href="{% url 'inscriptions:inscription_etudiant' %}">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+                </svg>
+                <span>Inscription</span>
+            </a>
+        {% elif user.role == "professeur" %}
+            <a class="navigation-mobile-lien{% if page == 'cours_professeur' or page == 'saisir_evaluation' %} actif{% endif %}"
+               href="{% url 'inscriptions:cours_professeur' %}">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5" />
+                </svg>
+                <span>Mes cours</span>
+            </a>
+            <a class="navigation-mobile-lien{% if page == 'etudiants_professeur' %} actif{% endif %}"
+               href="{% url 'inscriptions:etudiants_professeur' %}"
+               {% if page == 'etudiants_professeur' %} aria-current="page"{% endif %}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="9" cy="8" r="3" />
+                    <path d="M3 20v-1a6 6 0 0 1 12 0v1M16 5.5a3 3 0 0 1 0 5.8M18 14a5 5 0 0 1 3 4.6V20" />
+                </svg>
+                <span>Mes etudiants</span>
+            </a>
+        {% else %}
+            <a class="navigation-mobile-lien{% if page == 'configuration_site' %} actif{% endif %}"
+               href="{% url 'comptes:configuration_site' %}">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="3" />
+                    <path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.6.9l-.3 1.8h-2.8l-.3-1.8a8 8 0 0 1-1.6-.9l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-1.9l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.6-.9l.3-1.8h2.8l.3 1.8a8 8 0 0 1 1.6.9l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1-.1 1.8Z" />
+                </svg>
+                <span>Configuration</span>
+            </a>
+        {% endif %}
+        <a class="navigation-mobile-lien{% if page == 'profil' %} actif{% endif %}"
+           href="{% url 'comptes:profil' %}"
+           {% if page == 'profil' %} aria-current="page"{% endif %}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="8" r="4" />
+                <path d="M4 21a8 8 0 0 1 16 0" />
+            </svg>
+            <span>Profil</span>
+        </a>
+        <button class="navigation-mobile-lien navigation-mobile-plus"
+                type="button"
+                aria-controls="mobile-plus-panel"
+                aria-expanded="false">
+            <span class="navigation-mobile-plus-icone" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span>Plus</span>
+        </button>
+    </nav>
+{% endwith %}

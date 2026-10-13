@@ -1,0 +1,51 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Mes actes academiques | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Dossier academique</p>
+                    <h1>Mes actes</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            <section class="bienvenue">
+                <div>
+                    <p class="surtitre">DOCUMENTS OFFICIELS</p>
+                    <h2>Actes academiques</h2>
+                    <p>Seuls les documents delivres et non annules pour votre dossier sont presentes.</p>
+                </div>
+                <div class="bienvenue-marque" aria-hidden="true"><span>UEH</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span></div>
+            </section>
+            {% if actes %}
+                <section class="section-tableau" style="margin-top: 18px;">
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Reference</th>
+                                    <th>Type</th>
+                                    <th>Programme</th>
+                                    <th>Periode</th>
+                                    <th>Date de delivrance</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for acte in actes %}<tr><td><strong>{{ acte.reference }}</strong></td><td>{{ acte.get_type_acte_display }}</td><td>{{ acte.programme.nom }}</td><td>{{ acte.periode.nom }} · {{ acte.periode.annee_academique }}</td><td>{{ acte.date_delivrance|date:"d/m/Y" }}</td><td><a class="lien-action"
+   href="{% url 'rapports:acte_imprimable' acte.id %}">Ouvrir</a> · <a class="lien-action"
+    href="{% url 'rapports:telecharger_acte_pdf' acte.id %}">PDF</a></td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            {% else %}
+                <section class="message-role" role="status">
+                    <strong>Aucun acte disponible.</strong>
+                    <p>Les documents delivres par le registrariat apparaitront ici.</p>
+                </section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

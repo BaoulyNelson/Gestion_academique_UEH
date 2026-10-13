@@ -1,0 +1,162 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Liste des notes | GP7{% endblock %}
+{% block contenu %}
+    <style>
+        @media print {
+            .barre-laterale, .navigation-mobile, .mobile-plus-panel,
+            .mobile-plus-backdrop, .entete-page, .bienvenue,
+            .filtres-notes, .actions-impression { display: none !important; }
+            .contenu-principal { margin: 0; padding: 0; background: #fff; }
+        }
+    </style>
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Registrariat</p>
+                    <h1>Liste des notes</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            {% include "partials/bienvenue.django" with bienvenue_surtitre="GESTION DES NOTES" bienvenue_titre="Resultats par programme et periode" bienvenue_description="Filtrez les evaluations, consultez les moyennes et suivez leur publication." %}
+            <section class="section-tableau filtres-notes section-apres">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">PERIMETRE</p>
+                        <h2>Filtrer les evaluations</h2>
+                    </div>
+                </div>
+                <form method="get" class="formulaire-connexion grille-filtres-liste">
+                    {% if user.is_superuser %}<label for="{{ formulaire.entite.id_for_label }}">{{ formulaire.entite.label }}{{ formulaire.entite }}</label>{% else %}{{ formulaire.entite }}{% endif %}
+                    <label for="{{ formulaire.programme.id_for_label }}">{{ formulaire.programme.label }}{{ formulaire.programme }}</label>
+                    <label for="{{ formulaire.periode.id_for_label }}">{{ formulaire.periode.label }}{{ formulaire.periode }}</label>
+                    <label for="{{ formulaire.cours.id_for_label }}">{{ formulaire.cours.label }}{{ formulaire.cours }}</label>
+                    {% for erreur in formulaire.non_field_errors %}<p class="alerte"
+   role="alert">{{ erreur }}</p>{% endfor %}
+                    {% for champ in formulaire %}{% for erreur in champ.errors %}<p class="erreur-champ" role="alert">{{ erreur }}</p>{% endfor %}{% endfor %}
+                    <button class="bouton-principal"
+                            type="submit">Afficher les notes <span aria-hidden="true">→</span></button>
+                </form>
+            </section>
+            {% if resultats %}
+                <section class="section-tableau section-apres">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">MOYENNES DES NOTES PUBLIEES</p>
+                            <h2>Moyenne par cours</h2>
+                        </div>
+                    </div>
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Programme</th>
+                                    <th>Periode</th>
+                                    <th>Cours</th>
+                                    <th>Moyenne</th>
+                                    <th>Etudiants</th>
+                                </tr>
+                            </thead>
+                            <tbody>{% for ligne in moyennes.cours %}<tr><td>{{ ligne.cours.programme.nom }}</td><td>{{ ligne.periode.nom }}</td><td>{{ ligne.cours.code }} · {{ ligne.cours.nom }}</td><td>{{ ligne.moyenne }}</td><td>{{ ligne.nombre_etudiants }}</td></tr>{% endfor %}</tbody>
+                        </table>
+                    </div>
+                </section>
+                <section class="section-tableau section-apres">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">MOYENNES DES ETUDIANTS</p>
+                            <h2>Moyenne par programme</h2>
+                        </div>
+                    </div>
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Programme</th>
+                                    <th>Periode</th>
+                                    <th>Moyenne</th>
+                                    <th>Mention</th>
+                                    <th>Etudiants</th>
+                                </tr>
+                            </thead>
+                            <tbody>{% for ligne in moyennes.programmes %}<tr><td>{{ ligne.programme.nom }}</td><td>{{ ligne.periode.nom }}</td><td>{{ ligne.moyenne }}</td><td>{{ ligne.mention|default:"-" }}</td><td>{{ ligne.nombre_etudiants }}</td></tr>{% endfor %}</tbody>
+                        </table>
+                    </div>
+                </section>
+                <section class="section-tableau section-apres">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">MOYENNES ACADEMIQUES</p>
+                            <h2>Moyenne par periode</h2>
+                        </div>
+                    </div>
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Periode</th>
+                                    <th>Moyenne</th>
+                                    <th>Etudiants</th>
+                                </tr>
+                            </thead>
+                            <tbody>{% for ligne in moyennes.periodes %}<tr><td>{{ ligne.periode.nom }} · {{ ligne.periode.annee_academique }}</td><td>{{ ligne.moyenne }}</td><td>{{ ligne.nombre_etudiants }}</td></tr>{% endfor %}</tbody>
+                        </table>
+                    </div>
+                </section>
+                <section class="section-tableau section-apres liste-impression">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">DETAIL DES EVALUATIONS</p>
+                            <h2>{{ formulaire.cleaned_data.programme.nom }} · {{ formulaire.cleaned_data.periode.nom }}</h2>
+                        </div>
+                        <div class="actions-impression">
+                            <button class="bouton-principal"
+                                    type="button"
+                                    onclick="window.print()">Imprimer la liste <span aria-hidden="true">→</span></button>
+                        </div>
+                    </div>
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Etudiant</th>
+                                    <th>Code</th>
+                                    <th>Cours</th>
+                                    <th>Evaluation</th>
+                                    <th>Note</th>
+                                    <th>Coefficient</th>
+                                    <th>Moyenne du cours</th>
+                                    <th>Publication</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for resultat in resultats %}
+                                    {% for evaluation in resultat.evaluations %}
+                                        <tr>
+                                            <td>{{ resultat.etudiant.get_full_name|default:resultat.etudiant.username }}</td>
+                                            <td>{{ resultat.etudiant.profil_etudiant.code_etudiant|default:resultat.etudiant.username }}</td>
+                                            <td>{{ resultat.cours.code }} · {{ resultat.cours.nom }}</td>
+                                            <td>{{ evaluation.libelle }}</td>
+                                            <td>{{ evaluation.note }}</td>
+                                            <td>{{ evaluation.coefficient }}</td>
+                                            <td>{{ resultat.moyenne }}</td>
+                                            <td>{{ evaluation.est_publiee|yesno:"Publiee,En attente" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            {% elif recherche_effectuee %}
+                <section class="message-role" role="status">
+                    <strong>Aucune evaluation ne correspond a ce perimetre.</strong>
+                </section>
+            {% else %}
+                <section class="message-role" role="status">
+                    <strong>Choisissez un programme et une periode pour afficher les notes.</strong>
+                </section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

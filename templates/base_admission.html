@@ -1,0 +1,317 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description"
+          content="Espace d’admission de l’Université d'État d'Haïti" />
+    <title>{% block titre %}Admission UEH{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'images/logo.png' %}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+          rel="stylesheet" />
+    <link href="{% static 'css/style_admission.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/password-visibility.css' %}" rel="stylesheet" />
+    {% block styles_complementaires %}{% endblock %}
+  </head>
+  <body data-view="{{ request.resolver_match.url_name|default:'' }}">
+    {% if user.is_authenticated and not page_publique %}
+      <aside class="barre-laterale">
+        <a class="marque" href="{% url 'tableau_bord:accueil' %}">
+          <img class="marque-logo" src="{% static 'images/logo.png' %}" alt="" />
+          <span>ADMISSION<small>UNIVERSITÉ D'ÉTAT D'HAÏTI</small></span>
+        </a>
+        <div class="identite-utilisateur">
+          <span class="avatar-utilisateur">
+            <span class="avatar-initial">{{ user.prenom|default:"?"|slice:":1"|upper }}</span>
+            {% if not user.is_superuser and not user.est_administrateur_entite %}
+              <img class="avatar-photo"
+                   src="{% url 'candidats:photo_identite' %}"
+                   alt="" />
+            {% elif user.est_administrateur_entite and user.photo_profil %}
+              <img class="avatar-photo" src="{% url 'comptes:photo_profil' %}" alt="" />
+            {% endif %}
+          </span>
+          <span class="identite-texte"><strong>{{ user.get_full_name|default:"Compte candidat" }}</strong><small><i></i> En ligne</small></span>
+        </div>
+        <nav class="navigation-usager" aria-label="Navigation principale">
+          {% if user.is_superuser or user.est_administrateur_entite %}
+            <span class="navigation-titre">ESPACE ADMINISTRATION</span>
+            <a href="{% if user.is_superuser %}{% url 'admin:index' %}{% else %}{% url 'administration:liste_inscriptions' %}{% endif %}"
+               data-navigation="inscriptions"><i class="bi bi-journal-check"></i> Gestion des candidatures</a>
+            <a href="{% url 'administration:liste_salles' %}"
+               data-navigation="salles"><i class="bi bi-door-open"></i> Salles</a>
+            <a href="{% url 'administration:liste_options' %}"
+               data-navigation="options"><i class="bi bi-list-check"></i> Options</a>
+            <a href="{% url 'administration:liste_horaires' %}"
+               data-navigation="horaires"><i class="bi bi-clock"></i> Horaires</a>
+            <a href="{% url 'resultats:mes_resultats' %}"
+               data-navigation="resultats"><i class="bi bi-award"></i> Résultats</a>
+            <a href="{% url 'administration:journal_actions' %}"
+               data-navigation="journal"><i class="bi bi-clock-history"></i> Journal d’activité</a>
+            {% if user.est_administrateur_entite %}
+              <a href="{% url 'comptes:profil_administrateur' %}"
+                 data-navigation="profil"><i class="bi bi-person"></i> Mon profil</a>
+            {% endif %}
+          {% else %}
+            <span class="navigation-titre">ESPACE CANDIDAT</span>
+            <a href="{% url 'tableau_bord:guide_documents' %}"
+               data-navigation="guide"><i class="bi bi-journal-text"></i> Introduction</a>
+            <a href="{% url 'candidats:mon_profil' %}"
+               data-navigation="profil"><i class="bi bi-person"></i> Mon Profil</a>
+            <a href="{% url 'documents:mes_documents' %}"
+               data-navigation="documents"><i class="bi bi-file-earmark-arrow-up"></i> Mes Documents</a>
+            <a href="{% url 'tableau_bord:mes_inscriptions' %}"
+               data-navigation="inscriptions"><i class="bi bi-journal-check"></i> Mes Inscriptions</a>
+            <a href="{% url 'resultats:mes_resultats' %}"
+               data-navigation="resultats"><i class="bi bi-award"></i> Mes Résultats</a>
+          {% endif %}
+        </nav>
+        <div class="navigation-bas">
+          <a href="{% url 'tableau_bord:accueil' %}"><i class="bi bi-arrow-left"></i> Accueil public</a>
+          <form method="post"
+                action="{% url 'account_logout' %}"
+                data-confirmation-deconnexion>
+            {% csrf_token %}
+            <button type="submit">
+              <i class="bi bi-box-arrow-left"></i> Se déconnecter
+            </button>
+          </form>
+        </div>
+      </aside>
+    {% endif %}
+    <div class="conteneur-page {% if user.is_authenticated and not page_publique %}avec-navigation{% endif %}">
+      {% if user.is_authenticated and not page_publique %}
+        <header class="entete-page">
+          <div>
+            <img class="logo-entete-mobile"
+                 src="{% static 'images/logo.png' %}"
+                 alt="Logo de l’Université d’État d’Haïti" />
+            <div>
+              <strong>Université d'État d'Haïti</strong><span>Inscriptions au concours d'admission</span>
+            </div>
+          </div>
+          <div class="identite-entete">
+            <span class="courriel-entete">{{ user.email }}</span>
+            <span class="avatar-utilisateur avatar-entete">
+              <span class="avatar-initial">{{ user.prenom|default:"?"|slice:":1"|upper }}</span>
+              {% if not user.is_superuser and not user.est_administrateur_entite %}
+                <img class="avatar-photo"
+                     src="{% url 'candidats:photo_identite' %}"
+                     alt="" />
+              {% elif user.est_administrateur_entite and user.photo_profil %}
+                <img class="avatar-photo" src="{% url 'comptes:photo_profil' %}" alt="" />
+              {% endif %}
+            </span>
+          </div>
+        </header>
+        <nav class="navigation-basse-mobile {% if user.is_superuser or user.est_administrateur_entite %}navigation-admin-mobile{% endif %}"
+             aria-label="{% if user.is_superuser or user.est_administrateur_entite %}Navigation mobile de l’administration{% else %}Navigation mobile du candidat{% endif %}">
+          {% if user.is_superuser or user.est_administrateur_entite %}
+            <a href="{% if user.is_superuser %}{% url 'admin:index' %}{% else %}{% url 'administration:liste_inscriptions' %}{% endif %}"
+               data-navigation="inscriptions"><i class="bi bi-journal-check" aria-hidden="true"></i><span>Gestion</span></a>
+            <a href="{% url 'administration:liste_salles' %}"
+               data-navigation="salles"><i class="bi bi-door-open"
+   aria-hidden="true"></i><span>Salles</span></a>
+            <a href="{% url 'resultats:mes_resultats' %}"
+               data-navigation="resultats"><i class="bi bi-award"
+   aria-hidden="true"></i><span>Résultats</span></a>
+            <a href="{% url 'administration:journal_actions' %}"
+               data-navigation="journal"><i class="bi bi-clock-history" aria-hidden="true"></i><span>Journal</span></a>
+          {% else %}
+            <a href="{% url 'tableau_bord:guide_documents' %}"
+               data-navigation="guide"><i class="bi bi-journal-text" aria-hidden="true"></i><span>Introduction</span></a>
+            <a href="{% url 'candidats:mon_profil' %}"
+               data-navigation="profil"><i class="bi bi-person"
+   aria-hidden="true"></i><span>Profil</span></a>
+            <a href="{% url 'documents:mes_documents' %}"
+               data-navigation="documents"><i class="bi bi-file-earmark-arrow-up"
+   aria-hidden="true"></i><span>Documents</span></a>
+            <a href="{% url 'tableau_bord:mes_inscriptions' %}"
+               data-navigation="inscriptions"><i class="bi bi-journal-check" aria-hidden="true"></i><span>Inscriptions</span></a>
+          {% endif %}
+          <button type="button"
+                  data-ouvrir-plus
+                  aria-controls="panneau-plus"
+                  aria-expanded="false">
+            <i class="bi bi-list" aria-hidden="true"></i><span>Plus</span>
+          </button>
+        </nav>
+        <button class="voile-plus"
+                type="button"
+                data-fermer-plus
+                aria-label="Fermer le menu"
+                hidden></button>
+        <aside class="panneau-plus"
+               id="panneau-plus"
+               role="dialog"
+               aria-modal="true"
+               aria-labelledby="titre-panneau-espace"
+               hidden>
+          <div class="entete-panneau-plus">
+            <strong>ADMISSION UEH</strong><button class="bouton-fermer-plus"
+        type="button"
+        data-fermer-plus
+        aria-label="Fermer">
+              <i class="bi bi-x-lg"></i>
+            </button>
+          </div>
+          <p class="sur-titre">{% if user.is_superuser or user.est_administrateur_entite %}ESPACE ADMINISTRATION{% else %}ESPACE CANDIDAT{% endif %}</p>
+          <nav class="liens-panneau-plus" aria-labelledby="titre-panneau-espace">
+            <h2 id="titre-panneau-espace">Autres rubriques</h2>
+            {% if user.is_superuser or user.est_administrateur_entite %}
+              <a href="{% if user.is_superuser %}{% url 'admin:index' %}{% else %}{% url 'administration:liste_inscriptions' %}{% endif %}"
+                 data-navigation="inscriptions"><i class="bi bi-journal-check"></i> Gestion des candidatures</a>
+              <a href="{% url 'administration:liste_options' %}"
+                 data-navigation="options"><i class="bi bi-list-check"></i> Options</a>
+              <a href="{% url 'administration:liste_horaires' %}"
+                 data-navigation="horaires"><i class="bi bi-clock"></i> Horaires</a>
+              <a href="{% url 'resultats:mes_resultats' %}"
+                 data-navigation="resultats"><i class="bi bi-award"></i> Résultats</a>
+              <a href="{% url 'administration:journal_actions' %}"
+                 data-navigation="journal"><i class="bi bi-clock-history"></i> Journal d’activité</a>
+              {% if user.est_administrateur_entite %}
+                <a href="{% url 'comptes:profil_administrateur' %}"
+                   data-navigation="profil"><i class="bi bi-person"></i> Mon profil</a>
+              {% endif %}
+            {% else %}
+              <a href="{% url 'resultats:mes_resultats' %}"
+                 data-navigation="resultats"><i class="bi bi-award"></i> Mes Résultats</a>
+            {% endif %}
+            <a href="{% url 'tableau_bord:accueil' %}"
+               data-fermer-plus-lien><i class="bi bi-house-door"></i> Accueil public</a>
+            <form method="post"
+                  action="{% url 'account_logout' %}"
+                  data-confirmation-deconnexion>
+              {% csrf_token %}
+              <button type="submit">
+                <i class="bi bi-box-arrow-right"></i> Se déconnecter
+              </button>
+            </form>
+          </nav>
+        </aside>
+      {% endif %}
+      <main class="contenu-principal">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show"
+               role="status">
+            {{ message }}<button type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Fermer"></button>
+          </div>
+        {% endfor %}
+        {% block contenu %}{% endblock %}
+      </main>
+    </div>
+    {% if user.is_authenticated %}
+      <div class="modal fade"
+           id="modal-confirmation-deconnexion"
+           tabindex="-1"
+           aria-labelledby="titre-confirmation-deconnexion"
+           aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2 class="modal-title fs-5" id="titre-confirmation-deconnexion">Se déconnecter ?</h2>
+              <button type="button"
+                      class="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Annuler"></button>
+            </div>
+            <div class="modal-body">Votre session sera fermée. Voulez-vous continuer ?</div>
+            <div class="modal-footer">
+              <button type="button"
+                      class="btn btn-outline-secondary"
+                      data-bs-dismiss="modal">Rester connecté</button><button type="button" class="btn btn-danger" id="confirmer-deconnexion">Se déconnecter</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    {% if user.is_authenticated and not page_publique %}
+      <div class="visionneuse-document"
+           id="visionneuse-document"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="titre-visionneuse-document"
+           hidden>
+        <button class="visionneuse-document-fond"
+                type="button"
+                data-fermer-visionneuse
+                aria-label="Fermer l’aperçu"></button>
+        <section class="visionneuse-document-panneau">
+          <header class="visionneuse-document-barre">
+            <h2 id="titre-visionneuse-document" data-titre-visionneuse>Document</h2>
+            <div class="visionneuse-document-outils" aria-label="Outils du document">
+              <button type="button"
+                      data-fermer-visionneuse
+                      aria-label="Fermer"
+                      title="Fermer">
+                <i class="bi bi-x-lg"></i><span>Fermer</span>
+              </button>
+              <button type="button"
+                      data-outil-document="rotation-gauche"
+                      aria-label="Tourner à gauche"
+                      title="Tourner à gauche">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+              <button type="button"
+                      data-outil-document="rotation-droite"
+                      aria-label="Tourner à droite"
+                      title="Tourner à droite">
+                <i class="bi bi-arrow-clockwise"></i>
+              </button>
+              <button type="button"
+                      data-outil-document="zoom-moins"
+                      aria-label="Zoom arrière"
+                      title="Zoom arrière">
+                <i class="bi bi-zoom-out"></i>
+              </button>
+              <button type="button"
+                      data-outil-document="zoom-plus"
+                      aria-label="Zoom avant"
+                      title="Zoom avant">
+                <i class="bi bi-zoom-in"></i>
+              </button>
+              <button type="button"
+                      data-outil-document="ajuster"
+                      aria-label="Ajuster"
+                      title="Ajuster">
+                <i class="bi bi-arrows-angle-contract"></i>
+              </button>
+              <button type="button"
+                      data-outil-document="plein-ecran"
+                      aria-label="Plein écran"
+                      title="Plein écran">
+                <i class="bi bi-fullscreen"></i>
+              </button>
+              <a data-telecharger-visionneuse
+                 href="#"
+                 aria-label="Télécharger le document"
+                 title="Télécharger"><i class="bi bi-download"></i></a>
+            </div>
+          </header>
+          <div class="visionneuse-document-scene">
+            <iframe data-fichier-visionneuse title="Aperçu du document"></iframe>
+          </div>
+        </section>
+      </div>
+    {% endif %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/visibilite-mot-de-passe.js' %}" defer></script>
+    <script src="{% static 'js/confirmation-deconnexion.js' %}" defer></script>
+    <script src="{% static 'js/confirmation-suppression.js' %}" defer></script>
+    {% if user.is_authenticated %}
+      <script src="{% static 'js/avatar-utilisateur.js' %}" defer></script>
+    {% endif %}
+    {% if user.is_authenticated and not page_publique %}
+      <script src="{% static 'js/navigation-publique.js' %}" defer></script>
+      <script src="{% static 'js/visionneuse-document.js' %}" defer></script>
+      <script src="{% static 'js/visionneuse-document.js' %}" defer></script>
+    {% endif %}
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

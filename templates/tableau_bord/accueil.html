@@ -1,0 +1,359 @@
+{% extends "base_admission.html" %}
+{% load static %}
+{% block titre %}{{ titre_page }}{% endblock %}
+{% block styles_complementaires %}
+    <link href="{% static 'css/public.css' %}" rel="stylesheet">
+{% endblock %}
+{% block contenu %}
+    <div class="site-public">
+        <nav class="navbar navbar-expand-lg entete-publique"
+             aria-label="Navigation publique">
+            <div class="container-fluid">
+                <a class="marque-publique"
+                   href="{% url 'tableau_bord:accueil' %}"
+                   aria-label="Admission UEH, accueil">
+                    <img src="{% static 'images/logo.png' %}" alt="Logo UEH">
+                    <span>ADMISSION<small>UNIVERSITÉ D'ÉTAT D'HAÏTI</small></span>
+                </a>
+                {% if user.is_authenticated %}
+                    <a class="avatar-public-mobile"
+                       href="{% if user.is_superuser %}{% url 'admin:index' %}{% elif user.est_administrateur_entite %}{% url 'administration:liste_inscriptions' %}{% else %}{% url 'candidats:mon_profil' %}{% endif %}"
+                       aria-label="{% if user.is_superuser or user.est_administrateur_entite %}Administration{% else %}Mon profil{% endif %}"
+                       title="{% if user.is_superuser or user.est_administrateur_entite %}Administration{% else %}Mon profil{% endif %}">
+                        <span class="avatar-utilisateur">
+                            <span class="avatar-initial">{{ user.prenom|default:"?"|slice:":1"|upper }}</span>
+                            {% if not user.is_superuser and not user.est_administrateur_entite %}
+                                <img class="avatar-photo"
+                                     src="{% url 'candidats:photo_identite' %}"
+                                     alt="">
+                            {% endif %}
+                        </span>
+                    </a>
+                {% endif %}
+                <div class="collapse navbar-collapse" id="navigation-publique">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item"><a class="nav-link"
+   data-navigation="accueil"
+   href="{% url 'tableau_bord:accueil' %}">Accueil</a></li>
+                        <li class="nav-item"><a class="nav-link"
+   data-navigation="guide"
+   href="{% url 'tableau_bord:guide_public' %}">Guide du postulant</a></li>
+                        <li class="nav-item"><a class="nav-link"
+   data-navigation="entites"
+   href="{% url 'tableau_bord:entites_publiques' %}">Entités</a></li>
+                        <li class="nav-item"><a class="nav-link"
+   data-navigation="statistiques"
+   href="{% url 'tableau_bord:statistiques_publiques' %}">Statistiques</a></li>
+                        <li class="nav-item"><a class="nav-link"
+   data-navigation="a_propos"
+   href="{% url 'tableau_bord:a_propos_public' %}">À propos</a></li>
+                    </ul>
+                    <div class="actions-navigation">
+                        {% if user.is_authenticated %}
+                            <a class="btn btn-primary"
+                               href="{% if user.is_superuser %}{% url 'admin:index' %}{% elif user.est_administrateur_entite %}{% url 'administration:liste_inscriptions' %}{% else %}{% url 'tableau_bord:mes_inscriptions' %}{% endif %}">{% if user.is_superuser or user.est_administrateur_entite %}Espace de gestion{% else %}Mon espace{% endif %}</a>
+                            <form method="post"
+                                  action="{% url 'account_logout' %}"
+                                  data-confirmation-deconnexion>{% csrf_token %}<button class="lien-connexion bouton-deconnexion-public" type="submit">Se déconnecter</button></form>
+                        {% else %}
+                            <a class="btn btn-outline-primary" href="{% url 'account_login' %}">Se connecter</a>
+                            <a class="btn btn-primary" href="{% url 'account_signup' %}">Créer un compte</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <main>
+            {% if rubrique == "accueil" %}
+                <section class="hero-public" id="accueil">
+                    <div class="hero-contenu">
+                        <p class="sur-titre">PORTAIL PUBLIC D'ADMISSION</p>
+                        <h1>Concours d’admission à l’Université d’État d’Haïti</h1>
+                        <p>Consultez les facultés et écoles participantes, préparez votre dossier et découvrez chaque étape avant de vous inscrire.</p>
+                        <div class="actions-public">
+                            <a class="btn btn-primary"
+                               href="{% url 'tableau_bord:entites_publiques' %}">Découvrir les entités <i class="bi bi-arrow-right"></i></a>
+                            <a class="btn btn-outline-primary"
+                               href="{% url 'account_signup' %}">Commencer une inscription</a>
+                        </div>
+                    </div>
+                    <div class="hero-marque" aria-hidden="true">
+                        <img src="{% static 'images/logo.png' %}" alt="">
+                        <span>UNIVERSITÉ D'ÉTAT D'HAÏTI</span>
+                    </div>
+                </section>
+            {% endif %}
+            {% if rubrique == "accueil" or rubrique == "guide" %}
+                <section class="section-publique section-guide" id="guide">
+                    <div class="entete-section-publique">
+                        <p class="sur-titre">AVANT DE POSTULER</p>
+                        <h2>Guide du postulant</h2>
+                        <p>Les principales étapes de votre candidature, de la création du compte au suivi des résultats.</p>
+                    </div>
+                    <ol class="etapes-postulant">
+                        <li>
+                            <span class="numero-etape">01</span>
+                            <div>
+                                <h3>Créer un compte</h3>
+                                <p>Inscrivez une adresse e-mail valide et confirmez-la depuis le message reçu.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="numero-etape">02</span>
+                            <div>
+                                <h3>Compléter le profil</h3>
+                                <p>Renseignez vos informations personnelles, votre adresse et votre parcours scolaire.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="numero-etape">03</span>
+                            <div>
+                                <h3>Préparer les documents</h3>
+                                <p>Numérisez les pièces demandées dans un format accepté et lisible.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="numero-etape">04</span>
+                            <div>
+                                <h3>Choisir une entité</h3>
+                                <p>Consultez les facultés et écoles disponibles, puis sélectionnez le concours et l’option proposés.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="numero-etape">05</span>
+                            <div>
+                                <h3>Soumettre le dossier</h3>
+                                <p>Vérifiez vos informations avant l’envoi. Un numéro de dossier vous sera communiqué.</p>
+                            </div>
+                        </li>
+                        <li>
+                            <span class="numero-etape">06</span>
+                            <div>
+                                <h3>Suivre la candidature</h3>
+                                <p>Retrouvez le statut du dossier, l’affectation de salle et les résultats publiés dans votre espace.</p>
+                            </div>
+                        </li>
+                    </ol>
+                    <a class="lien-texte"
+                       href="{% url 'account_signup' %}">Créer mon compte pour commencer <i class="bi bi-arrow-right"></i></a>
+                </section>
+            {% endif %}
+            {% if rubrique == "accueil" or rubrique == "entites" %}
+                <section class="section-publique section-entites" id="entites">
+                    <div class="entete-section-publique entete-entites">
+                        <div>
+                            <p class="sur-titre">CONCOURS D'ADMISSION</p>
+                            <h2>Entités participantes</h2>
+                            <p>Parcourez les facultés et écoles proposées pour l’année d’admission.</p>
+                        </div>
+                        <span class="compteur-entites">{{ nb_entites }} entité{{ nb_entites|pluralize:"s" }}</span>
+                    </div>
+                    <div class="liste-entites">
+                        {% for entite in entites %}
+                            <article class="ligne-entite">
+                                <span class="code-entite">{{ entite.code }}</span>
+                                <div class="details-entite">
+                                    <h3>{{ entite.nom }}</h3>
+                                    {% with options=entite.options.all %}{% if options %}<p>{% for option in options %}{{ option.nom }}{% if not forloop.last %}<span aria-hidden="true"> · </span>{% endif %}{% endfor %}</p>{% else %}<p>Consultez les options lors de l’inscription.</p>{% endif %}{% endwith %}
+                                    {% if entite.email_contact %}<a class="courriel-entite"
+   href="mailto:{{ entite.email_contact }}">{{ entite.email_contact }}</a>{% endif %}
+                                    {% if entite.inscription_ouverte %}<span class="badge-entite badge-ouverte">Inscriptions ouvertes</span>{% else %}<span class="badge-entite badge-fermee">Inscriptions fermées</span>{% endif %}
+                                </div>
+                                {% if entite.inscription_ouverte %}
+                                    <a href="{% url 'account_signup' %}"
+                                       aria-label="Postuler à {{ entite.nom }}"><i class="bi bi-arrow-up-right"></i></a>
+                                {% else %}
+                                    <span class="icone-entite-fermee"
+                                          aria-label="Inscription fermée"><i class="bi bi-lock"
+   aria-hidden="true"></i></span>
+                                {% endif %}
+                            </article>
+                        {% empty %}
+                            <p class="etat-entites">Les entités participantes seront affichées ici dès leur publication.</p>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+            {% if rubrique == "accueil" or rubrique == "statistiques" %}
+                <section class="bande-statistiques" id="statistiques">
+                    <div class="section-publique tableau-statistiques">
+                        <div class="entete-section-publique entete-statistiques">
+                            <p class="sur-titre">DONNÉES DE LA PLATEFORME</p>
+                            <h2>Statistiques d’inscription</h2>
+                            <p>Indicateurs calculés à partir des dossiers et profils enregistrés.</p>
+                        </div>
+                        <div class="indicateurs-statistiques">
+                            <article class="indicateur-statistique indicateur-total"><span class="icone-indicateur"><i class="bi bi-people-fill"></i></span>
+                                <div><span>Total inscriptions</span><strong>{{ nb_inscriptions }}</strong></div>
+                            </article>
+                            <article class="indicateur-statistique indicateur-entites"><span class="icone-indicateur"><i class="bi bi-building"></i></span>
+                                <div><span>Entités actives</span><strong>{{ nb_entites }}</strong></div>
+                            </article>
+                            <article class="indicateur-statistique indicateur-aujourdhui"><span class="icone-indicateur"><i class="bi bi-calendar-check"></i></span>
+                                <div><span>Aujourd’hui</span><strong>{{ nb_inscriptions_aujourdhui }}</strong></div>
+                            </article>
+                        </div>
+                        <div class="grille-graphiques">
+                            <article class="carte-graphique graphique-entites">
+                                <h3><i class="bi bi-bar-chart-line"></i> Inscriptions par entité</h3>
+                                <div class="zone-graphique">
+                                    <canvas id="graphique-entites"
+                                            role="img"
+                                            aria-label="Nombre d’inscriptions par entité"></canvas>
+                                    <p class="graphe-vide" hidden>Aucune inscription enregistrée pour le moment.</p>
+                                </div>
+                            </article>
+                            <article class="carte-graphique graphique-sexe">
+                                <h3><i class="bi bi-pie-chart"></i> Répartition par sexe</h3>
+                                <div class="zone-graphique">
+                                    <canvas id="graphique-sexe"
+                                            role="img"
+                                            aria-label="Répartition des inscriptions par sexe"></canvas>
+                                    <p class="graphe-vide" hidden>Aucune donnée de profil renseignée pour le moment.</p>
+                                </div>
+                            </article>
+                            <article class="carte-graphique carte-graphique-large graphique-departements">
+                                <h3><i class="bi bi-geo-alt"></i> Inscriptions par département géographique</h3>
+                                <p class="sous-titre-graphique">Les profils sans département renseigné sont comptabilisés à part.</p>
+                                <div class="zone-graphique zone-graphique-departements">
+                                    <canvas id="graphique-departements"
+                                            role="img"
+                                            aria-label="Nombre d’inscriptions par département géographique"></canvas>
+                                    <p class="graphe-vide" hidden>Aucune inscription enregistrée pour le moment.</p>
+                                </div>
+                            </article>
+                            <article class="carte-graphique carte-graphique-large graphique-evolution">
+                                <h3><i class="bi bi-graph-up"></i> Évolution des inscriptions (30 derniers jours)</h3>
+                                <p class="sous-titre-graphique">Nombre de dossiers enregistrés chaque jour.</p>
+                                <div class="zone-graphique zone-graphique-evolution">
+                                    <canvas id="graphique-evolution"
+                                            role="img"
+                                            aria-label="Évolution quotidienne du nombre d’inscriptions sur trente jours"></canvas>
+                                    <p class="graphe-vide" hidden>Aucune inscription enregistrée sur cette période.</p>
+                                </div>
+                            </article>
+                        </div>
+                        <p class="note-statistiques">Les répartitions démographiques n’utilisent que les informations facultatives renseignées par les candidats.</p>
+                        {{ donnees_statistiques|json_script:"donnees-statistiques" }}
+                    </div>
+                </section>
+            {% endif %}
+            {% if rubrique == "accueil" or rubrique == "a_propos" %}
+                <section class="section-publique section-a-propos" id="a-propos">
+                    <div>
+                        <p class="sur-titre">À PROPOS</p>
+                        <h2>Université d’État d’Haïti</h2>
+                    </div>
+                    <div>
+                        <p>Ce portail d'admission constitue la première étape du parcours universitaire d’un étudiant à l’Université d’État d’Haïti (UEH). Il a été entièrement conçu et développé par la Direction Informatique du Rectorat, dans le cadre de la transformation numérique en cours au sein de l’institution. Cette plateforme vise à offrir aux futurs étudiants un espace centralisé, simple d’utilisation, pour soumettre leurs documents, suivre leur candidature et entamer leur intégration dans la communauté universitaire.
+
+Le portail d'admission s'inscrit dans un ensemble plus large d'initiatives numériques visant à moderniser l'ensemble du parcours étudiant. Parmi ces projets figurent la mise en place d'une base de données académique centralisée, qui permettra un suivi structuré et sécurisé du dossier de chaque étudiant, depuis l'admission jusqu'à l'obtention du diplôme. Conçue pour s'intégrer parfaitement à la base de données académique, cette plateforme sauvegarde toutes les informations fournies par les postulants, facilitant ainsi leur transmission automatique vers le système académique en cas d'admission.</p><a class="lien-texte" href="{% url 'account_signup' %}">Créer un compte candidat <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </section>
+            {% endif %}
+        </main>
+        <footer class="pied-public">
+            <div class="colonnes-pied-public">
+                <section aria-labelledby="titre-pied-contact">
+                    <h2 id="titre-pied-contact">Contact</h2>
+                    <p>Rectorat de l'UEH:</p>
+                    <p>Tel : +509 4609 4067 ; +509 4404 5257</p>
+                    <a href="mailto:admission@ueh.edu.ht">admission@ueh.edu.ht</a>
+                    <p>21 Rue Rivière, Port-au-Prince</p>
+                </section>
+                <section aria-labelledby="titre-pied-institutions">
+                    <h2 id="titre-pied-institutions">Institutions</h2>
+                    <ul>
+                        <li>L'Université d'État d'Haïti</li>
+                        <li>Campus Henry Christophe de Limonade</li>
+                        <li>Faculté des Médecins et Paramédicains</li>
+                        <li>Faculté des Sciences</li>
+                        <li>Laboratoire de Didactique et de Recherche en Éducation Physique</li>
+                    </ul>
+                </section>
+                <section aria-labelledby="titre-pied-liens">
+                    <h2 id="titre-pied-liens">Liens utiles</h2>
+                    <ul>
+                        <li><a href="{% url 'tableau_bord:statistiques_publiques' %}">Statistiques</a></li>
+                        <li><a href="{% url 'tableau_bord:a_propos_public' %}">À propos</a></li>
+                        <li><a href="{% url 'tableau_bord:guide_public' %}">Guide du postulant</a></li>
+                        <li><a href="{% url 'tableau_bord:entites_publiques' %}">Entités académiques</a></li>
+                        <li><a href="mailto:admission@ueh.edu.ht">Nous contacter</a></li>
+                    </ul>
+                </section>
+            </div>
+            <div class="copyright-pied-public">© 2026 Université d'État d'Haïti - Tous droits réservés</div>
+        </footer>
+        <nav class="navigation-basse-mobile"
+             aria-label="Navigation mobile de l’accueil">
+            <a data-navigation="accueil"
+               href="{% url 'tableau_bord:accueil' %}"
+               aria-label="Accueil"><i class="bi bi-house-door" aria-hidden="true"></i><span>Accueil</span></a>
+            <a data-navigation="guide"
+               href="{% url 'tableau_bord:guide_public' %}"
+               aria-label="Guide du postulant"><i class="bi bi-journal-text" aria-hidden="true"></i><span>Guide</span></a>
+            <a data-navigation="entites"
+               href="{% url 'tableau_bord:entites_publiques' %}"
+               aria-label="Entités"><i class="bi bi-building" aria-hidden="true"></i><span>Entités</span></a>
+            <a data-navigation="statistiques"
+               href="{% url 'tableau_bord:statistiques_publiques' %}"
+               aria-label="Statistiques"><i class="bi bi-bar-chart" aria-hidden="true"></i><span>Stats</span></a>
+            <button type="button"
+                    data-ouvrir-plus
+                    aria-controls="panneau-plus"
+                    aria-expanded="false"><i class="bi bi-list" aria-hidden="true"></i><span>Plus</span></button>
+        </nav>
+        <button class="voile-plus"
+                type="button"
+                data-fermer-plus
+                aria-label="Fermer le menu Plus"
+                hidden></button>
+        <aside class="panneau-plus"
+               id="panneau-plus"
+               role="dialog"
+               aria-modal="true"
+               aria-labelledby="titre-panneau-plus"
+               hidden>
+            <div class="entete-panneau-plus">
+                <a class="marque-publique"
+                   href="{% url 'tableau_bord:accueil' %}"
+                   data-fermer-plus-lien><img src="{% static 'images/logo.png' %}" alt="Logo UEH"><span>ADMISSION<small>UNIVERSITÉ D'ÉTAT D'HAÏTI</small></span></a>
+                <button class="bouton-fermer-plus"
+                        type="button"
+                        data-fermer-plus
+                        aria-label="Fermer le menu Plus">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                </button>
+            </div>
+            <p class="sur-titre">AUTRES RUBRIQUES</p>
+            <nav class="liens-panneau-plus" aria-labelledby="titre-panneau-plus">
+                <h2 id="titre-panneau-plus">Explorer</h2>
+                <a data-navigation="a_propos"
+                   href="{% url 'tableau_bord:a_propos_public' %}"
+                   data-fermer-plus-lien><i class="bi bi-info-circle" aria-hidden="true"></i> À propos</a>
+                {% if user.is_authenticated %}
+                          <a href="{% if user.is_superuser %}{% url 'admin:index' %}{% elif user.est_administrateur_entite %}{% url 'administration:liste_inscriptions' %}{% else %}{% url 'tableau_bord:mes_inscriptions' %}{% endif %}"><i class="bi bi-person"
+    aria-hidden="true"></i> {% if user.is_superuser or user.est_administrateur_entite %}Espace de gestion{% else %}Mon espace{% endif %}</a>
+                    <form method="post"
+                          action="{% url 'account_logout' %}"
+                          data-confirmation-deconnexion>{% csrf_token %}<button type="submit"><i class="bi bi-box-arrow-right" aria-hidden="true"></i> Se déconnecter</button></form>
+                {% else %}
+                    <a href="{% url 'account_login' %}"><i class="bi bi-box-arrow-in-right"
+   aria-hidden="true"></i> Se connecter</a>
+                    <a href="{% url 'account_signup' %}"><i class="bi bi-person-plus"
+   aria-hidden="true"></i> Créer un compte</a>
+                {% endif %}
+            </nav>
+            <p class="pied-panneau-plus">
+                Université d’État d’Haïti
+                <br>
+                Portail des concours d’admission
+            </p>
+        </aside>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <script src="{% static 'js/statistiques-publiques.js' %}" defer></script>
+    <script src="{% static 'js/navigation-publique.js' %}" defer></script>
+{% endblock %}

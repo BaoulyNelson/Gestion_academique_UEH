@@ -1,0 +1,55 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Mes professeurs | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Mon parcours</p>
+                    <h1>Mes professeurs</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            {% include "partials/bienvenue.django" with bienvenue_surtitre="MON PARCOURS" bienvenue_titre="Votre equipe pedagogique" bienvenue_description="Consultez les contacts des professeurs affectes a vos cours valides." %}
+            {% if affectations %}
+                <section class="section-tableau section-apres">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">COURS ET PERIODES VALIDES</p>
+                            <h2>Professeurs de mes cours</h2>
+                        </div>
+                    </div>
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Professeur</th>
+                                    <th>Contact</th>
+                                    <th>Cours</th>
+                                    <th>Programme</th>
+                                    <th>Periode</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for affectation in affectations %}
+                                    <tr>
+                                        <td><strong>{{ affectation.professeur.get_full_name|default:affectation.professeur.username }}</strong></td>
+                                        <td>{% if affectation.professeur.email %}<a href="mailto:{{ affectation.professeur.email }}">{{ affectation.professeur.email }}</a>{% else %}-{% endif %}</td>
+                                        <td>{{ affectation.cours.code }} · {{ affectation.cours.nom }}</td>
+                                        <td>{{ affectation.cours.programme.nom }}</td>
+                                        <td>{{ affectation.periode.nom }} · {{ affectation.periode.annee_academique }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            {% else %}
+                <section class="message-role section-apres" role="status">
+                    <strong>Aucun professeur n'est associe a vos cours valides.</strong>
+                    <p>Les professeurs apparaissent apres validation de votre inscription et affectation du cours.</p>
+                </section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

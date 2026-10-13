@@ -1,0 +1,87 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Listes d'etudiants | GP7{% endblock %}
+{% block contenu %}
+    <style>
+    @media print {
+        .barre-laterale, .entete-page, .bienvenue, .filtres-liste, .actions-impression { display: none !important; }
+        .contenu-principal { margin: 0; padding: 0; background: #fff; }
+        .liste-impression { break-inside: avoid; }
+    }
+    </style>
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Registrariat</p>
+                    <h1>Listes d'etudiants</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            {% include "partials/bienvenue.django" with bienvenue_surtitre="REGISTRARIAT" bienvenue_titre="Effectifs et inscriptions" bienvenue_description="Filtrez les inscriptions par programme, periode, cours, niveau ou statut." %}
+            <section class="section-tableau filtres-liste section-apres">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">PERIMETRE</p>
+                        <h2>Filtrer les inscriptions</h2>
+                    </div>
+                </div>
+                <form method="get" class="formulaire-connexion grille-filtres-liste">
+                    {% if user.is_superuser %}<label for="{{ formulaire.entite.id_for_label }}">{{ formulaire.entite.label }}{{ formulaire.entite }}</label>{% else %}{{ formulaire.entite }}{% endif %}
+                    <label for="{{ formulaire.programme.id_for_label }}">{{ formulaire.programme.label }}{{ formulaire.programme }}</label>
+                    <label for="{{ formulaire.periode.id_for_label }}">{{ formulaire.periode.label }}{{ formulaire.periode }}</label>
+                    <label for="{{ formulaire.niveau.id_for_label }}">{{ formulaire.niveau.label }}{{ formulaire.niveau }}</label>
+                    <label for="{{ formulaire.cours.id_for_label }}">{{ formulaire.cours.label }}{{ formulaire.cours }}</label>
+                    <label for="{{ formulaire.statut.id_for_label }}">{{ formulaire.statut.label }}{{ formulaire.statut }}</label>
+                    <label for="{{ formulaire.statut_dossier.id_for_label }}">{{ formulaire.statut_dossier.label }}{{ formulaire.statut_dossier }}</label>
+                    <label for="{{ formulaire.statut_passage.id_for_label }}">{{ formulaire.statut_passage.label }}{{ formulaire.statut_passage }}</label>
+                    <button class="bouton-principal" type="submit">Afficher <span aria-hidden="true">→</span></button>
+                </form>
+                {% if formulaire.errors %}<div class="alerte" role="alert">{{ formulaire.errors }}</div>{% endif %}
+            </section>
+            {% if inscriptions %}
+                <section class="section-tableau liste-impression section-apres">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">{{ entite.nom }}</p>
+                            <h2>Etudiants inscrits</h2>
+                            <p class="texte-secondaire">
+                                {% if formulaire.cleaned_data.programme %}{{ formulaire.cleaned_data.programme.nom }}{% endif %}
+                                {% if formulaire.cleaned_data.periode %} · {{ formulaire.cleaned_data.periode.nom }} · {{ formulaire.cleaned_data.periode.annee_academique }}{% endif %}
+                                {% if formulaire.cleaned_data.niveau %}· Niveau : {{ formulaire.cleaned_data.niveau.nom }}{% endif %}
+                                {% if formulaire.cleaned_data.cours %}· {{ formulaire.cleaned_data.cours.code }}{% endif %}
+                                {% if formulaire.cleaned_data.statut_dossier %}· Dossier : {{ formulaire.statut_dossier.value }}{% endif %}
+                            </p>
+                        </div>
+                        <div class="actions-impression">
+                            <button class="bouton-principal"
+                                    type="button"
+                                    onclick="window.print()">Imprimer la liste <span aria-hidden="true">→</span></button>
+                        </div>
+                    </div>
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Code etudiant</th>
+                                    <th>Nom</th>
+                                    <th>Programme</th>
+                                    <th>Niveau</th>
+                                    <th>Periode</th>
+                                    <th>Statut d'inscription</th>
+                                    <th>Statut du dossier</th>
+                                    <th>Conditions de passage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for inscription in inscriptions %}<tr><td>{{ forloop.counter }}</td><td><strong>{{ inscription.etudiant.profil_etudiant.code_etudiant|default:inscription.etudiant.username }}</strong></td><td>{{ inscription.etudiant.get_full_name|default:inscription.etudiant.username }}</td><td>{{ inscription.programme.nom }}</td><td>{% if inscription.periode.type_periode == "niveau" %}{{ inscription.periode.nom }}{% else %}-{% endif %}</td><td>{{ inscription.periode.nom }} · {{ inscription.periode.annee_academique }}</td><td>{{ inscription.get_statut_display }}</td><td>{{ inscription.statut_dossier_display }}</td><td>{{ inscription.statut_passage_display }}</td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            {% else %}
+                <section class="message-role" role="status"><strong>{% if entite %}Aucune inscription ne correspond aux filtres.{% else %}Choisissez une entite pour afficher la liste.{% endif %}</strong><p>Le resultat peut etre imprime apres avoir choisi une entite et un perimetre.</p></section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

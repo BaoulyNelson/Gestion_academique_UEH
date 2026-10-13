@@ -1,0 +1,8 @@
+<section class="bienvenue">
+    <div>
+        <p class="surtitre">{{ bienvenue_surtitre }}</p>
+        <h2>{{ bienvenue_titre }}</h2>
+        <p>{{ bienvenue_description }}</p>
+    </div>
+    <div class="bienvenue-marque" aria-hidden="true"><span>UEH</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span><span class="marque-point">&#8203;</span></div>
+</section>

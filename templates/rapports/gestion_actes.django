@@ -1,0 +1,79 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Emission des actes | GP7{% endblock %}
+{% block contenu %}
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Registrariat</p>
+                    <h1>Emission des actes</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            {% include "partials/bienvenue.django" with bienvenue_surtitre="REGISTRARIAT" bienvenue_titre="Documents academiques officiels" bienvenue_description="Enregistrez et suivez les attestations, certificats, releves et diplomes delivres." %}
+            {% for message in messages %}<div class="alerte" role="status">{{ message }}</div>{% endfor %}
+            <section class="section-tableau" style="margin-top: 18px;">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">NOUVEL ACTE</p>
+                        <h2>Enregistrer une delivrance</h2>
+                    </div>
+                </div>
+                <form method="post"
+                      class="formulaire-connexion"
+                      style="padding: 22px;
+                             margin: 0">
+                    {% csrf_token %}
+                    {{ formulaire.non_field_errors }}
+                    {% for champ in formulaire %}
+                        <label for="{{ champ.id_for_label }}">{{ champ.label }}</label>
+                        {{ champ }}
+                        {% if champ.help_text %}<p class="texte-secondaire">{{ champ.help_text }}</p>{% endif %}
+                        {{ champ.errors }}
+                    {% endfor %}
+                    <button class="bouton-principal"
+                            type="submit">Emettre l'acte <span aria-hidden="true">→</span></button>
+                </form>
+            </section>
+            <section class="section-tableau" style="margin-top: 18px;">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">HISTORIQUE</p>
+                        <h2>Actes de l'entite</h2>
+                    </div>
+                </div>
+                {% if actes %}
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Reference</th>
+                                    <th>Etudiant</th>
+                                    <th>Type</th>
+                                    <th>Programme</th>
+                                    <th>Periode</th>
+                                    <th>Delivre le</th>
+                                    <th>Etat</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for acte in actes %}<tr><td><strong>{{ acte.reference }}</strong></td><td>{{ acte.etudiant.get_full_name|default:acte.etudiant.username }}</td><td>{{ acte.get_type_acte_display }}</td><td>{{ acte.programme.nom }}</td><td>{{ acte.periode.nom }}</td><td>{{ acte.date_delivrance|date:"d/m/Y" }}</td><td>{% if acte.est_annule %}Annule{% else %}Valide{% endif %}</td><td>{% if not acte.est_annule %}<a class="lien-action"
+   href="{% url 'rapports:acte_imprimable' acte.pk %}">Ouvrir</a> · <a class="lien-action"
+    href="{% url 'rapports:telecharger_acte_pdf' acte.pk %}">PDF</a>{% endif %}</td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="etat-vide">
+                        <span class="etat-vide-symbole" aria-hidden="true">→</span>
+                        <div>
+                            <strong>Aucun acte emis</strong>
+                            <p>Les actes emis par le Registrariat apparaitront ici.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </section>
+        </main>
+    </div>
+{% endblock %}

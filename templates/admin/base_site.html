@@ -1,0 +1,14 @@
+{% extends "admin/base.html" %}
+{% load static %}
+{% block title %}{{ title }} | Administration Admission UEH{% endblock %}
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">Administration Admission UEH</a></h1>
+{% endblock %}
+{% block extrastyle %}
+{{ block.super }}
+<link href="{% static 'css/password-visibility.css' %}" rel="stylesheet">
+{% endblock %}
+{% block extrahead %}
+{{ block.super }}
+<script src="{% static 'js/visibilite-mot-de-passe.js' %}" defer></script>
+{% endblock %}

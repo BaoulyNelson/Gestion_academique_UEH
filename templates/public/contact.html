@@ -1,0 +1,61 @@
+{% extends "base_gp7.html" %}
+{% load static %}
+{% block titre %}Contact | {{ site_config.nom_site }}{% endblock %}
+{% block contenu %}
+    <main class="public-landing contact-page">
+        <header class="public-header" id="accueil">
+            <a class="public-brand" href="{% url 'comptes:landing' %}#accueil" aria-label="{{ site_config.nom_site }}, accueil">
+                {% if site_config.logo %}
+                    <img class="public-brand-logo" src="{{ site_config.logo.url }}" alt="Logo de {{ site_config.nom_site }}">
+                {% else %}
+                    <img class="public-brand-logo" src="{% static 'images/logo.png' %}" alt="Logo de {{ site_config.nom_site }}">
+                {% endif %}
+                <span class="public-brand-separator" aria-hidden="true"></span>
+                <span class="public-brand-copy"><strong>{{ site_config.nom_site }}</strong><small>{{ site_config.slogan }}</small></span>
+            </a>
+            <nav class="public-nav" aria-label="Navigation publique">
+                <a href="{% url 'comptes:landing' %}#accueil"><svg class="public-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" /></svg><span>Accueil</span></a>
+                <a href="{% url 'comptes:landing' %}#apropos"><svg class="public-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg><span>A propos</span></a>
+                <a href="{% url 'comptes:landing' %}#formations"><svg class="public-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5" /></svg><span>Formations</span></a>
+                <a href="{% url 'comptes:landing' %}#calendrier"><svg class="public-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18" /></svg><span>Calendrier</span></a>
+                <a class="actif" href="{% url 'contact:contact' %}" aria-current="page"><svg class="public-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg><span>Contact</span></a>
+            </nav>
+            <div class="public-header-actions">
+                <a class="public-login" href="{% if user.is_authenticated %}{% url 'comptes:tableau_de_bord' %}{% else %}{% url 'comptes:connexion' %}{% endif %}">{% if user.is_authenticated %}Mon espace{% else %}Se connecter{% endif %}</a>
+                <a class="public-admission" href="{% url 'tableau_bord:accueil' %}">Demander une admission <span aria-hidden="true">↗</span></a>
+            </div>
+        </header>
+        <section class="contact-content" aria-labelledby="contact-title">
+            <p class="public-section-kicker">NOUS JOINDRE</p>
+            <h1 id="contact-title">Contactez {{ site_config.nom_site }}</h1>
+            <p class="contact-intro">Une question ou besoin d'assistance ? Envoyez-nous un message et notre equipe vous repondra.</p>
+            <div class="contact-details">
+                {% if site_config.email_contact %}<p><strong>E-mail</strong><a href="mailto:{{ site_config.email_contact }}">{{ site_config.email_contact }}</a></p>{% endif %}
+                {% if site_config.telephone %}<p><strong>Telephone</strong><a href="tel:{{ site_config.telephone }}">{{ site_config.telephone }}</a></p>{% endif %}
+                {% if site_config.adresse %}<p><strong>Adresse</strong><span>{{ site_config.adresse }}</span></p>{% endif %}
+            </div>
+            {% if messages %}
+                <div class="contact-messages" aria-live="polite">
+                    {% for message in messages %}<p class="contact-message contact-message-{{ message.tags }}">{{ message }}</p>{% endfor %}
+                </div>
+            {% endif %}
+            {% if site_config.email_contact %}
+                <form class="contact-form" method="post">
+                    {% csrf_token %}
+                    {% for champ in formulaire %}
+                        <div class="contact-form-field">
+                            <label for="{{ champ.id_for_label }}">{{ champ.label }}</label>
+                            {{ champ }}
+                            {% for erreur in champ.errors %}<p class="contact-form-error">{{ erreur }}</p>{% endfor %}
+                        </div>
+                    {% endfor %}
+                    {% if formulaire.non_field_errors %}<p class="contact-form-error">{{ formulaire.non_field_errors }}</p>{% endif %}
+                    <button class="public-primary-action" type="submit">Envoyer le message <span aria-hidden="true">→</span></button>
+                </form>
+            {% else %}
+                <p class="contact-unavailable">Le formulaire de contact n'est pas encore configure. Veuillez reessayer plus tard.</p>
+            {% endif %}
+        </section>
+        {% include "partials/footer.html" %}
+    </main>
+{% endblock %}

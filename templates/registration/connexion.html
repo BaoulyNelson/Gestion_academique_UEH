@@ -1,0 +1,55 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Connexion | GP7{% endblock %}
+{% block contenu %}
+    <main class="connexion-page">
+        <section class="connexion-marque" aria-label="GP7, gestion academique">
+            <a class="marque" href="{% url 'comptes:connexion' %}">
+                <span class="marque-symbole" aria-hidden="true">G</span>
+                <span>GP7 <small>REGISTRARIAT</small></span>
+            </a>
+            <div class="connexion-intro">
+                <p class="surtitre">UNIVERSITE · DOSSIERS · PARCOURS</p>
+                <h1>Le parcours academique, clairement suivi.</h1>
+                <p>Un espace de travail commun pour les entites, les etudiants et les equipes du registrariat.</p>
+            </div>
+            <span class="connexion-edition">SYSTEME DE GESTION ACADEMIQUE</span>
+        </section>
+        <section class="connexion-formulaire">
+            <div class="connexion-formulaire-interieur">
+                <p class="surtitre">ESPACE SECURISE</p>
+                <h2>Connexion</h2>
+                <p class="texte-secondaire">Connectez-vous avec votre adresse e-mail ou votre nom d'utilisateur.</p>
+                {% if form.errors %}
+                    <div class="alerte"
+                         role="alert">Identifiant ou mot de passe invalide. Verifiez vos informations.</div>
+                {% endif %}
+                {% if next and user.is_authenticated %}
+                    <div class="alerte" role="alert">Votre compte ne peut pas ouvrir cette page.</div>
+                {% endif %}
+                <form method="post" class="formulaire-connexion">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ next }}">
+                    <label for="id_username">Nom d'utilisateur ou adresse e-mail</label>
+                    <input id="id_username"
+                           name="username"
+                           type="text"
+                           autocomplete="username"
+                           placeholder="prenom.nom ou prenom.nom@example.test"
+                           required
+                           autofocus>
+                    <label for="id_password">Mot de passe</label>
+                    <input id="id_password"
+                           name="password"
+                           type="password"
+                           autocomplete="current-password"
+                           required>
+                    <button class="bouton-principal"
+                            type="submit">Ouvrir ma session <span aria-hidden="true">→</span></button>
+                    <a class="lien-mot-de-passe-oublie"
+                       href="{% url 'comptes:password_reset' %}">Mot de passe oublie ?</a>
+                </form>
+                <p class="note-securite">Les acces et les actions sont associes a un compte utilisateur.</p>
+            </div>
+        </section>
+    </main>
+{% endblock %}

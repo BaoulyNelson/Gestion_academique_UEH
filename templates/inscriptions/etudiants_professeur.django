@@ -1,0 +1,87 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Mes etudiants | GP7{% endblock %}
+{% block contenu %}
+    <style>
+    @media print {
+        .barre-laterale, .navigation-mobile, .mobile-plus-panel, .mobile-plus-backdrop, .entete-page, .bienvenue, .filtres-etudiants, .actions-impression { display: none !important; }
+        .contenu-principal { margin: 0; padding: 0; background: #fff; }
+        .liste-impression { break-inside: avoid; }
+    }
+    </style>
+    <div class="application">
+        <main class="contenu-principal">
+            <header class="entete-page">
+                <div>
+                    <p class="fil-ariane">GP7 <span>/</span> Enseignement</p>
+                    <h1>Mes etudiants</h1>
+                </div>
+                {% include "partials/identite_utilisateur.django" %}
+            </header>
+            {% include "partials/bienvenue.django" with bienvenue_surtitre="ENSEIGNEMENT" bienvenue_titre="Classes sous votre responsabilite" bienvenue_description="Consultez vos listes de classe selon les cours qui vous sont attribues." %}
+            <section class="section-tableau filtres-etudiants section-apres">
+                <div class="section-entete">
+                    <div>
+                        <p class="surtitre">MES AFFECTATIONS</p>
+                        <h2>Filtrer les listes de classe</h2>
+                    </div>
+                </div>
+                <form method="get" class="formulaire-connexion grille-filtres-liste">
+                    <label for="filtre-cours">
+                        Cours
+                        <select id="filtre-cours" name="cours">
+                            <option value="">Tous mes cours</option>
+                            {% for option in cours %}<option value="{{ option.pk }}"
+        {% if cours_selectionne == option.pk|stringformat:"s" %} selected{% endif %}>{{ option.code }} · {{ option.nom }}</option>{% endfor %}
+                        </select>
+                    </label>
+                    <label for="filtre-periode">
+                        Periode
+                        <select id="filtre-periode" name="periode">
+                            <option value="">Toutes mes periodes</option>
+                            {% for option in periodes %}<option value="{{ option.pk }}"
+        {% if periode_selectionnee == option.pk|stringformat:"s" %} selected{% endif %}>{{ option.nom }} · {{ option.annee_academique }}</option>{% endfor %}
+                        </select>
+                    </label>
+                    <button class="bouton-principal" type="submit">Afficher <span aria-hidden="true">→</span></button>
+                </form>
+            </section>
+            {% if selections %}
+                <section class="section-tableau liste-impression section-apres">
+                    <div class="section-entete">
+                        <div>
+                            <p class="surtitre">{{ selections|length }} INSCRIPTION{{ selections|length|pluralize:"S" }}</p>
+                            <h2>Etudiants inscrits</h2>
+                        </div>
+                        <div class="actions-impression">
+                            <button class="bouton-principal"
+                                    type="button"
+                                    onclick="window.print()">Imprimer la liste <span aria-hidden="true">→</span></button>
+                        </div>
+                    </div>
+                    <div class="tableau-defilement">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Code etudiant</th>
+                                    <th>Nom</th>
+                                    <th>Cours</th>
+                                    <th>Programme</th>
+                                    <th>Periode</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for selection in selections %}<tr><td>{{ forloop.counter }}</td><td><strong>{{ selection.inscription.etudiant.profil_etudiant.code_etudiant|default:selection.inscription.etudiant.username }}</strong></td><td>{{ selection.inscription.etudiant.get_full_name|default:selection.inscription.etudiant.username }}</td><td>{{ selection.cours.code }} · {{ selection.cours.nom }}</td><td>{{ selection.inscription.programme.nom }}</td><td>{{ selection.inscription.periode.nom }} · {{ selection.inscription.periode.annee_academique }}</td></tr>{% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            {% else %}
+                <section class="message-role section-apres" role="status">
+                    <strong>Aucun etudiant ne correspond a ces affectations.</strong>
+                    <p>Seules les inscriptions validees aux cours et periodes qui vous sont affectes apparaissent ici.</p>
+                </section>
+            {% endif %}
+        </main>
+    </div>
+{% endblock %}

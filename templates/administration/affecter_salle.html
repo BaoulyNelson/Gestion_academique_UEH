@@ -1,0 +1,26 @@
+{% extends "base_admission.html" %} {% block titre %}Affecter une salle | Admission UEH{% endblock %} {% block contenu %}
+<div class="page-formulaire">
+  <a class="retour-page"
+     href="{% url 'administration:liste_inscriptions' %}"><i class="bi bi-arrow-left"></i> Inscriptions de mon entité</a>
+  <p class="sur-titre mt-4">DOSSIER #{{ inscription.numero_dossier }}</p>
+  <h1>Affecter une salle</h1>
+  <p class="texte-intro">{{ inscription.entite.code }} - {{ inscription.entite.nom }}</p>
+  <form method="post" class="formulaire-principal">
+    {% csrf_token %}
+    {% if formulaire.non_field_errors %}
+      <div class="alert alert-danger">{{ formulaire.non_field_errors }}</div>
+    {% endif %}
+    <div class="mb-3">
+      <label class="form-label"
+             for="{{ formulaire.salle.id_for_label }}">{{ formulaire.salle.label }}</label>{{ formulaire.salle }}{% for erreur in formulaire.salle.errors %}
+      <div class="invalid-feedback d-block">{{ erreur }}</div>
+    {% endfor %}
+  </div>
+  <div class="actions-formulaire">
+    <a class="btn btn-outline-secondary"
+       href="{% url 'administration:liste_inscriptions' %}">Annuler</a><a class="btn btn-outline-primary"
+   href="{% url 'administration:liste_salles' %}">Gérer les salles</a><button type="submit" class="btn btn-primary">Enregistrer l’affectation</button>
+  </div>
+</form>
+</div>
+{% endblock %}

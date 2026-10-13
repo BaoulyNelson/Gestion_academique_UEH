@@ -1,0 +1,149 @@
+{% extends "base_gp7.html" %}
+{% load static %}
+{% block titre %}{{ site_config.nom_site|default:'GP7' }} | Accueil{% endblock %}
+{% block contenu %}
+    <main class="public-landing">
+        <header class="public-header">
+            <a class="public-brand" href="#accueil" aria-label="GP7, accueil">
+                {% if site_config.logo %}
+                    <img class="public-brand-logo"
+                         src="{{ site_config.logo.url }}"
+                         alt="Logo de {{ site_config.nom_site }}">
+                {% else %}
+                    <img class="public-brand-logo"
+                         src="{% static 'images/logo.png' %}"
+                         alt="UEH">
+                {% endif %}
+                <span class="public-brand-separator" aria-hidden="true"></span>
+                <span class="public-brand-copy"><strong>GP7</strong><small>{{ site_config.nom_site|default:"Universite d'Etat d'Haiti" }} · {{ site_config.slogan|default:"Systeme de gestion academique" }}</small></span>
+            </a>
+            <nav class="public-nav" aria-label="Navigation publique">
+                <a class="actif" href="#accueil"><svg class="public-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" /></svg><span>Accueil</span></a>
+                <a href="#apropos"><svg class="public-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" /></svg><span>A propos</span></a>
+                <a href="#formations"><svg class="public-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5" /></svg><span>Formations</span></a>
+                <a href="#calendrier"><svg class="public-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M16 3v4M8 3v4M3 10h18" /></svg><span>Calendrier</span></a>
+                <a href="{% url 'contact:contact' %}"><svg class="public-nav-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg><span>Contact</span></a>
+            </nav>
+            <div class="public-header-actions">
+                <a class="public-login"
+                href="{% if user.is_authenticated %}{% url 'comptes:tableau_de_bord' %}{% else %}{% url 'comptes:connexion' %}{% endif %}">{% if user.is_authenticated %}Mon espace{% else %}Se connecter{% endif %}</a>
+                <a class="public-admission"
+                href="{% url 'tableau_bord:accueil' %}">Demander une admission</a>
+            </div>
+        </header>
+        <section class="public-hero" id="accueil" aria-labelledby="public-hero-title">
+            <img class="public-hero-image"
+                 src="{% static 'images/campus.png' %}"
+                 alt="Campus de l'Universite d'Etat d'Haiti">
+            <div class="public-hero-content">
+                <p class="public-eyebrow">BIENVENUE SUR GP7</p>
+                <h1 id="public-hero-title">Le parcours academique de l'UEH, au meme endroit.</h1>
+                <p>Le systeme de gestion academique de l'Universite d'Etat d'Haiti au service des etudiants, des enseignants et du personnel administratif.</p>
+                <div class="public-hero-actions">
+                    <a class="public-primary-action"
+                       href="{% if user.is_authenticated %}{% url 'comptes:tableau_de_bord' %}{% else %}{% url 'comptes:connexion' %}{% endif %}">{% if user.is_authenticated %}Retourner a mon espace{% else %}Acceder a mon espace{% endif %} <span aria-hidden="true">→</span></a>
+                    <a class="public-secondary-action"
+                       href="#apropos"><span aria-hidden="true">▶</span> Decouvrir GP7</a>
+                </div>
+            </div>
+            <p class="public-hero-caption">Universite d'Etat d'Haiti <span aria-hidden="true">/</span> Port-au-Prince</p>
+        </section>
+        <section class="public-shortcuts" aria-label="Acces rapides aux services">
+            <a class="public-shortcut" href="{% url 'comptes:connexion' %}">
+                <span class="public-shortcut-icon icon-inscription" aria-hidden="true">01</span>
+                <strong>Inscriptions en ligne</strong>
+                <span>Preinscriptions et choix de cours selon votre entite.</span>
+            </a>
+            <a class="public-shortcut" href="{% url 'comptes:connexion' %}">
+                <span class="public-shortcut-icon icon-resultats" aria-hidden="true">02</span>
+                <strong>Consultation des resultats</strong>
+                <span>Notes publiees et releves academiques.</span>
+            </a>
+            <a class="public-shortcut" href="{% url 'comptes:connexion' %}">
+                <span class="public-shortcut-icon icon-gestion" aria-hidden="true">03</span>
+                <strong>Gestion academique</strong>
+                <span>Outils dedies aux enseignants et au Registrariat.</span>
+            </a>
+            <a class="public-shortcut" href="{% url 'comptes:connexion' %}">
+                <span class="public-shortcut-icon icon-rapports" aria-hidden="true">04</span>
+                <strong>Rapports et statistiques</strong>
+                <span>Indicateurs issus des donnees academiques.</span>
+            </a>
+        </section>
+        <section class="public-dashboard" aria-label="Informations academiques">
+            <section class="public-panel" id="formations">
+                <div class="public-panel-heading">
+                    <div>
+                        <p class="public-section-kicker">OFFRE DE FORMATION</p>
+                        <h2>Programmes actifs</h2>
+                    </div>
+                    <span class="public-panel-count">{{ statistiques.programmes }}</span>
+                </div>
+                {% if programmes %}
+                    <ul class="public-program-list">
+                        {% for programme in programmes %}
+                            <li>
+                                <div><strong>{{ programme.nom }}</strong><span>{{ programme.entite.nom }}</span></div>
+                                <span class="public-list-arrow" aria-hidden="true">↗</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="public-empty">Les programmes seront affiches ici lorsqu'ils seront publies.</p>
+                {% endif %}
+            </section>
+            <section class="public-panel" id="calendrier">
+                <div class="public-panel-heading">
+                    <div>
+                        <p class="public-section-kicker">PERIODES ACADEMIQUES</p>
+                        <h2>Calendrier</h2>
+                    </div>
+                    <a class="public-text-link"
+                       href="{% if user.is_authenticated %}{% url 'comptes:tableau_de_bord' %}{% else %}{% url 'comptes:connexion' %}{% endif %}">Espace GP7 <span aria-hidden="true">→</span></a>
+                </div>
+                {% if periodes %}
+                    <ol class="public-period-list">
+                        {% for periode in periodes %}
+                            <li>
+                                <time datetime="{{ periode.date_debut|date:'Y-m-d' }}"><strong>{{ periode.date_debut|date:"d" }}</strong><span>{{ periode.date_debut|date:"M"|upper }}</span></time>
+                                <div><strong>{{ periode.nom }}</strong><span>{{ periode.entite.nom }} · {{ periode.annee_academique }}</span></div>
+                                <i aria-hidden="true"></i>
+                            </li>
+                        {% endfor %}
+                    </ol>
+                {% else %}
+                    <p class="public-empty">Aucune periode a venir n'est publiee pour le moment.</p>
+                {% endif %}
+            </section>
+            <section class="public-panel public-metrics-panel">
+                <div class="public-panel-heading">
+                    <div>
+                        <p class="public-section-kicker">DONNEES DU PORTAIL</p>
+                        <h2>GP7 en chiffres</h2>
+                    </div>
+                    <span class="public-metric-year">En direct</span>
+                </div>
+                <div class="public-metrics">
+                    <div><span class="metric-symbol symbol-blue" aria-hidden="true">E</span><strong>{{ statistiques.etudiants }}</strong><span>Etudiants inscrits</span></div>
+                    <div><span class="metric-symbol symbol-green"
+      aria-hidden="true">P</span><strong>{{ statistiques.professeurs }}</strong><span>Enseignants</span></div>
+                    <div><span class="metric-symbol symbol-violet"
+      aria-hidden="true">U</span><strong>{{ statistiques.entites }}</strong><span>Entites actives</span></div>
+                    <div><span class="metric-symbol symbol-orange"
+      aria-hidden="true">C</span><strong>{{ statistiques.cours }}</strong><span>Cours actifs</span></div>
+                </div>
+                <p class="public-metric-note">Comptes et inscriptions valides enregistres dans GP7.</p>
+            </section>
+        </section>
+        <section class="public-about" id="apropos">
+            <div>
+                <p class="public-section-kicker">LE PORTAIL DE L'UEH</p>
+                <h2>Une gestion academique au service de la communaute universitaire.</h2>
+            </div>
+            <p>GP7 rassemble les inscriptions, les resultats, les dossiers et les outils du Registrariat dans un espace adapte au regime academique de chaque entite.</p>
+            <a class="public-about-link"
+               href="{% url 'comptes:connexion' %}">Ouvrir mon espace <span aria-hidden="true">→</span></a>
+        </section>
+        {% include "partials/footer.html" %}
+    </main>
+{% endblock %}

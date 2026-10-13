@@ -1,0 +1,38 @@
+{% load static %}
+<footer class="public-footer">
+    <a class="public-footer-brand" href="{% url 'comptes:landing' %}#accueil">
+        {% if site_config.logo %}
+            <img class="public-footer-logo"
+                 src="{{ site_config.logo.url }}"
+                 alt="Logo de {{ site_config.nom_site }}">
+        {% else %}
+            <img class="public-footer-logo"
+                 src="{% static 'images/logo.png' %}"
+                 alt="Logo de {{ site_config.nom_site }}">
+        {% endif %}
+        <span><strong>{{ site_config.nom_site }}</strong><small>{{ site_config.slogan }}</small></span>
+    </a>
+    <div class="public-footer-links">
+        <strong>Liens utiles</strong>
+        <a href="{% url 'comptes:landing' %}#apropos">A propos</a>
+        <a href="{% url 'comptes:landing' %}#formations">Offre de formation</a>
+        <a href="{% url 'comptes:landing' %}#calendrier">Calendrier academique</a>
+    </div>
+    <div class="public-footer-links">
+        <strong>Assistance</strong>
+        <a href="{% url 'contact:contact' %}">Nous contacter</a>
+        {% if site_config.telephone %}<a href="tel:{{ site_config.telephone }}">{{ site_config.telephone }}</a>{% endif %}
+        {% if site_config.email_contact %}<a href="mailto:{{ site_config.email_contact }}">{{ site_config.email_contact }}</a>{% endif %}
+        <a href="{% if user.is_authenticated %}{% url 'comptes:tableau_de_bord' %}{% else %}{% url 'comptes:connexion' %}{% endif %}">{% if user.is_authenticated %}Mon espace{% else %}Connexion{% endif %}</a>
+    </div>
+    <div class="public-footer-note">
+        {% if site_config.adresse %}<p>{{ site_config.adresse }}</p>{% endif %}
+        {% if site_config.texte_pied_page %}<p>{{ site_config.texte_pied_page }}</p>{% endif %}
+    </div>
+    <div class="public-footer-bottom">
+        <span>© {{ annee_courante }} {{ site_config.nom_site }}</span>
+        <a class="public-back-to-top" href="#accueil" aria-label="Retour en haut de page" title="Retour en haut">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 15 7-7 7 7" /></svg>
+        </a>
+    </div>
+</footer>

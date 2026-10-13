@@ -1,0 +1,88 @@
+{% extends "base_admission.html" %}
+{% block titre %}Gestion des {{ nom_ressource|lower }}s | Admission UEH{% endblock %}
+{% block contenu %}
+    <div class="titre-section">
+        <div>
+            <p class="sur-titre">ESPACE ADMINISTRATION</p>
+            <h1>Gestion des {{ nom_ressource|lower }}s</h1>
+        </div>
+        <a class="btn btn-outline-primary"
+           href="{% url 'administration:liste_inscriptions' %}">Candidatures</a>
+    </div>
+    <form method="post"
+          action="{{ url_ressource }}"
+          class="formulaire-principal mb-4">
+        {% csrf_token %}
+        {% if objet_modifie %}<input type="hidden" name="pk" value="{{ objet_modifie.pk }}">{% endif %}
+        {% for field in formulaire %}
+            {% if field.is_hidden %}
+                {{ field }}
+            {% elif field.widget.input_type == "checkbox" %}
+                <div class="form-check mb-3">
+                    {{ field }}
+                    <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                </div>
+            {% else %}
+                <div class="mb-3">
+                    <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% for error in field.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+        {% for error in formulaire.non_field_errors %}<div class="alert alert-danger">{{ error }}</div>{% endfor %}
+        <div class="actions-formulaire">
+            <button class="btn btn-primary"
+                    type="submit">{% if objet_modifie %}Enregistrer{% else %}Ajouter{% endif %} {{ nom_ressource|lower }}</button>
+            {% if objet_modifie %}<a class="btn btn-outline-secondary" href="{{ url_ressource }}">Annuler</a>{% endif %}
+        </div>
+    </form>
+    <div class="table-responsive tableau-dossiers">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>{{ nom_ressource }}</th>
+                    <th>Entité</th>
+                    {% if nom_ressource == "Salle" %}<th>Capacité</th>{% endif %}
+                    {% if nom_ressource == "Option" or nom_ressource == "Horaire" %}<th>État</th>{% endif %}
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ressource in ressources %}
+                    <tr>
+                        <td>{% if nom_ressource == "Horaire" %}{{ ressource.get_code_display }}{% else %}{{ ressource.nom }}{% endif %}</td>
+                        <td>{{ ressource.entite.code }}</td>
+                        {% if nom_ressource == "Salle" %}<td>{{ ressource.capacite }}</td>{% endif %}
+                        {% if nom_ressource == "Option" %}<td>{% if ressource.active %}Active{% else %}Inactive{% endif %}</td>{% endif %}
+                        {% if nom_ressource == "Horaire" %}<td>{% if ressource.actif %}Actif{% else %}Inactif{% endif %}</td>{% endif %}
+                        <td class="actions-admin">
+                            <a href="{{ url_ressource }}?modifier={{ ressource.pk }}"
+                               title="Modifier"
+                               aria-label="Modifier {{ ressource }}"><i class="bi bi-pencil"></i></a>
+                                <form method="post"
+                                    action="{{ url_ressource }}"
+                                    data-confirmation-suppression="toujours"
+                                    data-message-confirmation="Supprimer définitivement cette ressource ?">
+                                {% csrf_token %}
+                                <input type="hidden" name="pk" value="{{ ressource.pk }}">
+                                <button type="submit"
+                                        name="action"
+                                        value="supprimer"
+                                        title="Supprimer"
+                                        aria-label="Supprimer {{ ressource }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="texte-vide-tableau">Aucune ressource pour cette entité.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

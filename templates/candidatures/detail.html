@@ -1,0 +1,163 @@
+{% extends "base_admission.html" %} {% block titre %}Dossier #{{
+inscription.numero_dossier }} | Admission UEH{% endblock %} {% block contenu %}
+<div class="page-formulaire">
+  <a class="retour-page" href="{% url 'tableau_bord:mes_inscriptions' %}"
+    ><i class="bi bi-arrow-left"></i> Mes inscriptions</a
+  >
+  <p class="sur-titre mt-4">RÉCAPITULATIF DE CANDIDATURE</p>
+  <h1>#{{ inscription.numero_dossier }}</h1>
+  <div class="carte-dossier dossier-detail">
+    <span class="badge-statut statut-{{ inscription.statut|lower }}"
+      >{{ inscription.get_statut_display }}</span
+    >
+    <h2>{{ inscription.entite.code }} - {{ inscription.entite.nom }}</h2>
+    <dl class="liste-detail">
+      <dt>Numéro de dossier</dt>
+      <dd>#{{ inscription.numero_dossier }}</dd>
+      <dt>Option</dt>
+      <dd>{{ inscription.option.nom|default:"Aucune option" }}</dd>
+      <dt>Année académique</dt>
+      <dd>{{ inscription.annee_academique }}</dd>
+      <dt>Horaire</dt>
+      <dd>{{ inscription.get_horaire_display|default:"À déterminer" }}</dd>
+      <dt>Date d'inscription</dt>
+      <dd>{{ inscription.date_inscription|date:"d/m/Y à H:i" }}</dd>
+      <dt>Salle</dt>
+      <dd>
+        {% if inscription.salle %}{{ inscription.salle.nom }}{% else %}En
+        attente d'affectation{% endif %}
+      </dd>
+      <dt>Statut</dt>
+      <dd>{{ inscription.get_statut_display }}</dd>
+    </dl>
+    <section class="resume-section">
+      <h2>Identité et coordonnées</h2>
+      <dl class="liste-detail">
+        <dt>Nom complet</dt>
+        <dd>
+          {{ candidat.utilisateur.get_full_name|default:"Non renseigné" }}
+        </dd>
+        <dt>Adresse e-mail</dt>
+        <dd>{{ candidat.utilisateur.email }}</dd>
+        <dt>Nationalité</dt>
+        <dd>{{ candidat.nationalite|default:"Non renseignée" }}</dd>
+        <dt>Téléphone</dt>
+        <dd>{{ candidat.telephone|default:"Non renseigné" }}</dd>
+        <dt>Date de naissance</dt>
+        <dd>
+          {{ candidat.date_naissance|date:"d/m/Y"|default:"Non renseignée" }}
+        </dd>
+        <dt>Lieu de naissance</dt>
+        <dd>{{ candidat.lieu_naissance|default:"Non renseigné" }}</dd>
+        <dt>Parent ou responsable</dt>
+        <dd>{{ candidat.nom_parent_responsable|default:"Non renseigné" }}</dd>
+        <dt>NIF</dt>
+        <dd>{{ candidat.nif|default:"Non renseigné" }}</dd>
+        <dt>NINU</dt>
+        <dd>{{ candidat.ninu|default:"Non renseigné" }}</dd>
+        <dt>Adresse</dt>
+        <dd>{{ candidat.adresse|default:"Non renseignée" }}</dd>
+        <dt>Ville</dt>
+        <dd>{{ candidat.ville|default:"Non renseignée" }}</dd>
+        <dt>Département</dt>
+        <dd>
+          {{ candidat.get_departement_geographique_display|default:"Non renseigné" }}
+        </dd>
+        <dt>Sexe</dt>
+        <dd>{{ candidat.get_sexe_display|default:"Non renseigné" }}</dd>
+      </dl>
+    </section>
+    <section class="resume-section">
+      <h2>Parcours scolaire</h2>
+      <dl class="liste-detail">
+        <dt>Établissement scolaire</dt>
+        <dd>{{ candidat.etablissement_scolaire|default:"Non renseigné" }}</dd>
+        <dt>Année d’obtention</dt>
+        <dd>{{ candidat.annee_obtention|default:"Non renseignée" }}</dd>
+      </dl>
+      <h3 class="h5">Écoles enregistrées</h3>
+      <ul class="profil-documents-existants">
+        {% for ecole in ecoles %}
+        <li>
+          {{ ecole.nom }} · {{ ecole.zone }} · {{ ecole.certificat.name }}
+          <a
+            data-apercu-document
+            data-titre-document="Certificat scolaire — {{ ecole.nom }}"
+            data-url-telechargement="{% url 'candidats:certificat_ecole' ecole.pk %}"
+            href="{% url 'candidats:apercu_ecole' ecole.pk %}"
+            >Voir le certificat scolaire</a
+          >
+        </li>
+        {% endfor %}
+      </ul>
+      <h3 class="h5">Études supérieures</h3>
+      <ul class="profil-documents-existants">
+        {% for entree in parcours_apercus %}
+        <li>
+          <strong>{{ entree.etude.etablissement }}</strong>
+          {{ entree.etude.get_niveau_display }} · {{ entree.etude.programme }}
+          {% for fichier in entree.documents %}
+          <a
+            data-apercu-document
+            data-titre-document="{{ fichier.titre }} — {{ entree.etude.etablissement }}"
+            data-url-telechargement="{{ fichier.telecharger }}"
+            href="{{ fichier.apercu }}"
+            >Voir {{ fichier.titre }}</a
+          >
+          {% endfor %}
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+    <section class="resume-section">
+      <h2>Pièces du dossier</h2>
+      <div class="table-responsive tableau-dossiers">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>Document</th>
+              <th>Date d’envoi</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for document in documents %}
+            <tr>
+              <td>{{ document.get_type_document_display }}</td>
+              <td>{{ document.date_televersement|date:"d/m/Y à H:i" }}</td>
+              <td>
+                <a
+                  href="{% url 'documents:apercu' document.pk %}"
+                  data-apercu-document
+                  data-titre-document="{{ document.get_type_document_display }}"
+                  data-url-telechargement="{% url 'documents:telecharger' document.pk %}"
+                  aria-label="Voir {{ document.get_type_document_display }}"
+                  >Voir <i class="bi bi-eye"></i
+                ></a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="3" class="texte-vide-tableau">
+                Aucune pièce téléversée.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <div class="actions-dossier">
+      <a
+        class="btn btn-outline-primary"
+        href="{% url 'candidatures:recu' inscription.pk %}"
+        ><i class="bi bi-receipt"></i> Reçu de paiement</a
+      ><a
+        class="btn btn-primary"
+        href="{% url 'candidatures:pdf' inscription.pk %}"
+        ><i class="bi bi-printer"></i> Imprimer PDF</a
+      >
+    </div>
+  </div>
+</div>
+{% endblock %}

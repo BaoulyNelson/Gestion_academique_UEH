@@ -1,0 +1,159 @@
+code_entite,option,matiere
+FASCH,,Compréhension de texte et Français
+FASCH,,Culture Générale et Sciences Sociales
+FASCH,,Mathématiques
+FDS,Génie Civil,Mathématiques
+FDS,Génie Civil,Physique
+FDS,Génie Civil,Chimie
+FDS,Génie Civil,Français / Compréhension de texte
+FDS,Génie Électromécanique,Mathématiques
+FDS,Génie Électromécanique,Physique
+FDS,Génie Électromécanique,Chimie
+FDS,Génie Électromécanique,Français / Compréhension de texte
+FDS,Architecture,Mathématiques
+FDS,Architecture,Physique
+FDS,Architecture,Chimie
+FDS,Architecture,Français / Compréhension de texte
+FDS,Topographie et Géodésie,Mathématiques
+FDS,Topographie et Géodésie,Physique
+FDS,Topographie et Géodésie,Chimie
+FDS,Topographie et Géodésie,Français / Compréhension de texte
+FDS,Géosciences,Mathématiques
+FDS,Géosciences,Physique
+FDS,Géosciences,Chimie
+FDS,Géosciences,Français / Compréhension de texte
+FDS,Mathématiques,Mathématiques
+FDS,Mathématiques,Physique
+FDS,Mathématiques,Chimie
+FDS,Mathématiques,Français / Compréhension de texte
+FDS,Physique,Mathématiques
+FDS,Physique,Physique
+FDS,Physique,Chimie
+FDS,Physique,Français / Compréhension de texte
+FDS,Chimie,Mathématiques
+FDS,Chimie,Physique
+FDS,Chimie,Chimie
+FDS,Chimie,Français / Compréhension de texte
+FMP,Doctorat en Médecine Générale,Biologie / Sciences Naturelles
+FMP,Doctorat en Médecine Générale,Chimie
+FMP,Doctorat en Médecine Générale,Physique
+FMP,Doctorat en Médecine Générale,Mathématiques
+FMP,Doctorat en Médecine Générale,Français / Culture Générale
+FMP,Licence en Pharmacie,Biologie / Sciences Naturelles
+FMP,Licence en Pharmacie,Chimie
+FMP,Licence en Pharmacie,Physique
+FMP,Licence en Pharmacie,Mathématiques
+FMP,Licence en Pharmacie,Français / Culture Générale
+FMP,Licence en Biologie Médicale (Technologie Médicale),Biologie / Sciences Naturelles
+FMP,Licence en Biologie Médicale (Technologie Médicale),Chimie
+FMP,Licence en Biologie Médicale (Technologie Médicale),Physique
+FMP,Licence en Biologie Médicale (Technologie Médicale),Mathématiques
+FMP,Licence en Biologie Médicale (Technologie Médicale),Français / Culture Générale
+FO,,Biologie / Zoologie / Anatomie humaine
+FO,,Chimie
+FO,,Physique
+FO,,Français / Compréhension de texte
+FAMV,,Mathématiques
+FAMV,,Physique
+FAMV,,Chimie
+FAMV,,Biologie / Botanique / Zoologie
+FAMV,,Français
+FDSE,Sciences Juridiques (Droit),Culture Générale et Histoire d'Haïti
+FDSE,Sciences Juridiques (Droit),Philosophie / Connaissances politiques et sociales
+FDSE,Sciences Juridiques (Droit),Français (Compréhension et Dissertation / Rédaction)
+FDSE,Sciences Économiques,Mathématiques
+FDSE,Sciences Économiques,Culture Générale / Actualité économique
+FDSE,Sciences Économiques,Français / Logique
+INAGHEI,Administration Publique,Mathématiques
+INAGHEI,Administration Publique,"Culture Générale, Histoire et Relations Internationales"
+INAGHEI,Administration Publique,Français
+INAGHEI,Gestion des Entreprises,Mathématiques
+INAGHEI,Gestion des Entreprises,"Culture Générale, Histoire et Relations Internationales"
+INAGHEI,Gestion des Entreprises,Français
+INAGHEI,Relations Internationales,Mathématiques
+INAGHEI,Relations Internationales,"Culture Générale, Histoire et Relations Internationales"
+INAGHEI,Relations Internationales,Français
+INAGHEI,Comptabilité,Mathématiques
+INAGHEI,Comptabilité,"Culture Générale, Histoire et Relations Internationales"
+INAGHEI,Comptabilité,Français
+INAGHEI,Sciences Politiques,Mathématiques
+INAGHEI,Sciences Politiques,"Culture Générale, Histoire et Relations Internationales"
+INAGHEI,Sciences Politiques,Français
+FE,,Sciences Sociales et Culture Générale
+FE,,Français / Compréhension de texte
+FE,,Mathématiques / Raisonnement logique
+FLA,,Français
+FLA,,Créole (Kreyòl)
+FLA,,Aptitudes linguistiques générales / Langues secondes
+IERAH,,Histoire et Géographie d'Haïti et de la Caraïbe
+IERAH,,Français / Compréhension de texte
+IERAH,,"Culture générale, Arts et Patrimoine"
+ENS,Section Sciences Exactes - Mathématiques,Mathématiques
+ENS,Section Sciences Exactes - Mathématiques,Physique
+ENS,Section Sciences Exactes - Physique,Physique
+ENS,Section Sciences Exactes - Physique,Mathématiques
+ENS,Section Sciences Exactes - Biologie,Biologie Animale
+ENS,Section Sciences Exactes - Biologie,Biologie Végétale
+ENS,Section Sciences Exactes - Biologie,Chimie-Physique
+ENS,Section Sciences Exactes - Biologie,Mathématiques
+ENS,Section Lettres et Sciences Humaines - Philosophie,Dissertation Philosophique
+ENS,Section Lettres et Sciences Humaines - Philosophie,Étude de Texte
+ENS,Section Lettres et Sciences Humaines - Lettres Modernes,Dissertation Littéraire
+ENS,Section Lettres et Sciences Humaines - Lettres Modernes,Créole (Kreyòl)
+ENS,Section Lettres et Sciences Humaines - Histoire-Géographie,Histoire
+ENS,Section Lettres et Sciences Humaines - Histoire-Géographie,Géographie
+ENS,"Section Lettres et Sciences Humaines - Langues Vivantes (Espagnol, Anglais)",Français
+ENS,"Section Lettres et Sciences Humaines - Langues Vivantes (Espagnol, Anglais)",Anglais
+ENS,"Section Lettres et Sciences Humaines - Langues Vivantes (Espagnol, Anglais)",Espagnol
+ENS,"Section Lettres et Sciences Humaines - Langues Vivantes (Espagnol, Anglais)",Créole (Kreyòl)
+CHCL,Faculté des Sciences de l'Ingénieur - Génie Civil,Mathématiques
+CHCL,Faculté des Sciences de l'Ingénieur - Génie Civil,Physique
+CHCL,Faculté des Sciences de l'Ingénieur - Génie Civil,Chimie
+CHCL,Faculté des Sciences de l'Ingénieur - Génie Civil,Français
+CHCL,Faculté des Sciences de l'Ingénieur - Génie Informatique,Mathématiques
+CHCL,Faculté des Sciences de l'Ingénieur - Génie Informatique,Physique
+CHCL,Faculté des Sciences de l'Ingénieur - Génie Informatique,Chimie
+CHCL,Faculté des Sciences de l'Ingénieur - Génie Informatique,Français
+CHCL,Faculté des Sciences de la Santé - Médecine Générale,Biologie
+CHCL,Faculté des Sciences de la Santé - Médecine Générale,Chimie
+CHCL,Faculté des Sciences de la Santé - Médecine Générale,Physique
+CHCL,Faculté des Sciences de la Santé - Médecine Générale,Mathématiques
+CHCL,Faculté des Sciences de la Santé - Médecine Générale,Français
+CHCL,Faculté des Sciences de la Santé - Sciences Infirmières,Biologie
+CHCL,Faculté des Sciences de la Santé - Sciences Infirmières,Chimie
+CHCL,Faculté des Sciences de la Santé - Sciences Infirmières,Physique
+CHCL,Faculté des Sciences de la Santé - Sciences Infirmières,Mathématiques
+CHCL,Faculté des Sciences de la Santé - Sciences Infirmières,Français
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Agronomie",Biologie
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Agronomie",Chimie
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Agronomie",Mathématiques
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Agronomie",Physique
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Agronomie",Français
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Agro-industrie",Biologie
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Agro-industrie",Chimie
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Agro-industrie",Mathématiques
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Agro-industrie",Physique
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Agro-industrie",Français
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Sciences Halieutiques",Biologie
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Sciences Halieutiques",Chimie
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Sciences Halieutiques",Mathématiques
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Sciences Halieutiques",Physique
+CHCL,"Faculté des Sciences Agronomiques, Halieutiques et Agroalimentaires - Sciences Halieutiques",Français
+CHCL,Faculté des Arts et des Sciences de l'Éducation - Psychoéducation,Français
+CHCL,Faculté des Arts et des Sciences de l'Éducation - Psychoéducation,Culture Générale / Sciences Sociales
+CHCL,Faculté des Arts et des Sciences de l'Éducation - Psychoéducation,Mathématiques de base
+CHCL,Faculté des Arts et des Sciences de l'Éducation - Éducation (Mathématiques),Français
+CHCL,Faculté des Arts et des Sciences de l'Éducation - Éducation (Mathématiques),Culture Générale / Sciences Sociales
+CHCL,Faculté des Arts et des Sciences de l'Éducation - Éducation (Mathématiques),Mathématiques de base
+CHCL,Faculté des Arts et des Sciences de l'Éducation - Éducation (Sciences et Technologies),Français
+CHCL,Faculté des Arts et des Sciences de l'Éducation - Éducation (Sciences et Technologies),Culture Générale / Sciences Sociales
+CHCL,Faculté des Arts et des Sciences de l'Éducation - Éducation (Sciences et Technologies),Mathématiques de base
+CHCL,Faculté des Arts et des Sciences de l'Éducation - Éducation (Sciences Économiques et Sociales),Français
+CHCL,Faculté des Arts et des Sciences de l'Éducation - Éducation (Sciences Économiques et Sociales),Culture Générale / Sciences Sociales
+CHCL,Faculté des Arts et des Sciences de l'Éducation - Éducation (Sciences Économiques et Sociales),Mathématiques de base
+CHCL,Sciences de Gestion et Administratives - Gestion,Mathématiques
+CHCL,Sciences de Gestion et Administratives - Gestion,Culture Générale
+CHCL,Sciences de Gestion et Administratives - Gestion,Français
+CHCL,Sciences de Gestion et Administratives - Économie,Mathématiques
+CHCL,Sciences de Gestion et Administratives - Économie,Culture Générale
+CHCL,Sciences de Gestion et Administratives - Économie,Français

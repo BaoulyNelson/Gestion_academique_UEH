@@ -1,0 +1,346 @@
+{% extends "base_gp7.html" %}
+{% block titre %}Fiche d'inscription | {{ site_config.nom_site }}{% endblock %}
+{% block contenu %}
+    <style>
+        .fiche-inscription {
+            width: min(100%, 900px);
+            margin: 28px auto;
+            padding: clamp(22px, 5vw, 54px);
+            border: 1px solid var(--ligne);
+            background: #fff;
+        }
+        .fiche-inscription-entete {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--foret);
+        }
+        .fiche-inscription-entete h2 {
+            margin: 0;
+            color: var(--foret);
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 19px;
+            font-weight: 400;
+        }
+        .fiche-inscription-entete p {
+            margin: 5px 0 0;
+            color: var(--encre-douce);
+            font-size: 11px;
+        }
+        .fiche-inscription-embleme {
+            width: 82px;
+            height: 82px;
+            flex: 0 0 82px;
+            object-fit: contain;
+        }
+        .fiche-inscription-embleme-fallback {
+            display: grid;
+            width: 82px;
+            height: 82px;
+            flex: 0 0 82px;
+            place-items: center;
+            border: 1px solid var(--ligne);
+            color: var(--foret);
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 28px;
+        }
+        .fiche-inscription-titre {
+            margin: 30px 0 24px;
+            text-align: center;
+        }
+        .fiche-inscription-titre p {
+            margin: 0 0 7px;
+            color: var(--corail);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        .fiche-inscription-titre h1 {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 25px;
+            font-weight: 400;
+        }
+        .fiche-inscription-etudiant {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 118px;
+            gap: 22px;
+            align-items: start;
+        }
+        .fiche-inscription-photo {
+            display: block;
+            width: 118px;
+            height: 142px;
+            border: 1px solid var(--ligne);
+            object-fit: cover;
+        }
+        .fiche-inscription-photo-absence {
+            display: grid;
+            width: 118px;
+            height: 142px;
+            place-items: center;
+            border: 1px dashed #b7c2ba;
+            color: #76847b;
+            background: #f8faf7;
+            font-size: 10px;
+            text-align: center;
+        }
+        .fiche-inscription-donnees {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0 22px;
+            margin: 0;
+        }
+        .fiche-inscription-donnees div {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--ligne);
+        }
+        .fiche-inscription-donnees dt {
+            color: var(--encre-douce);
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+        .fiche-inscription-donnees dd {
+            margin: 5px 0 0;
+            font-size: 12px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+        .fiche-inscription-section {
+            margin-top: 26px;
+        }
+        .fiche-inscription-section h2 {
+            margin: 0 0 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--ligne);
+            color: var(--foret);
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 16px;
+            font-weight: 400;
+        }
+        .fiche-inscription-cours {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .fiche-inscription-cours th,
+        .fiche-inscription-cours td {
+            padding: 9px 8px;
+            border-bottom: 1px solid var(--ligne);
+            font-size: 10px;
+            text-align: left;
+        }
+        .fiche-inscription-cours th {
+            color: var(--encre-douce);
+            font-weight: 700;
+        }
+        .fiche-inscription-signature {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            margin-top: 58px;
+            text-align: center;
+        }
+        .fiche-inscription-signature div {
+            padding-top: 9px;
+            border-top: 1px solid #849087;
+            color: var(--encre-douce);
+            font-size: 10px;
+        }
+        .fiche-inscription-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            width: min(100%, 900px);
+            margin: 0 auto 30px;
+        }
+        @media print {
+            .barre-laterale, .navigation-mobile,
+            .mobile-plus-backdrop, .mobile-plus-panel, .entete-page,
+            .fiche-inscription-actions { display: none !important; }
+            .contenu-principal { min-height: 0; margin: 0; padding: 0; background: #fff; }
+            .fiche-inscription { width: 100%; margin: 0; border: 0; }
+        }
+        @media (max-width: 560px) {
+            .fiche-inscription-etudiant { grid-template-columns: minmax(0, 1fr); }
+            .fiche-inscription-photo, .fiche-inscription-photo-absence { grid-row: 1; }
+            .fiche-inscription-donnees { grid-template-columns: minmax(0, 1fr); }
+            .fiche-inscription-signature { gap: 20px; }
+        }
+    </style>
+    <main class="contenu-principal">
+        <header class="entete-page">
+            <div>
+                <p class="fil-ariane">{{ site_config.nom_site }} <span>/</span> Inscriptions</p>
+                <h1>Fiche d'inscription</h1>
+            </div>
+        </header>
+        <article class="fiche-inscription">
+            <header class="fiche-inscription-entete">
+                <div>
+                    <h2>{{ site_config.nom_site|upper }}</h2>
+                    <p>{{ inscription.programme.entite.nom }}</p>
+                    <p>{{ site_config.adresse }}</p>
+                </div>
+                {% if site_config.logo %}
+                    <img class="fiche-inscription-embleme"
+                         src="{{ site_config.logo.url }}"
+                         alt="Logo de {{ site_config.nom_site }}">
+                {% else %}
+                    <span class="fiche-inscription-embleme-fallback"
+                          aria-hidden="true">{{ site_config.nom_site|first|default:"S"|upper }}</span>
+                {% endif %}
+            </header>
+            <div class="fiche-inscription-titre">
+                <p>REGISTRARIAT</p>
+                <h1>Fiche d'inscription pedagogique</h1>
+            </div>
+            <section class="fiche-inscription-etudiant"
+                     aria-label="Informations de l'etudiant">
+                <dl class="fiche-inscription-donnees">
+                    <div>
+                        <dt>Nom complet</dt>
+                        <dd>
+                            {{ inscription.etudiant.get_full_name|default:inscription.etudiant.username }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Code etudiant</dt>
+                        <dd>
+                            {{ profil.code_etudiant|default:"Non attribue" }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>NIF</dt>
+                        <dd>
+                            {{ profil.nif|default:"Non renseigne" }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>CIN</dt>
+                        <dd>
+                            {{ profil.cin|default:"Non renseigne" }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Sexe</dt>
+                        <dd>
+                            {{ profil.get_sexe_display|default:"Non renseigne" }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Date de naissance</dt>
+                        <dd>
+                            {{ profil.date_naissance|date:"d/m/Y"|default:"Non renseignee" }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Telephone</dt>
+                        <dd>
+                            {{ profil.telephone|default:"Non renseigne" }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Adresse</dt>
+                        <dd>
+                            {{ profil.adresse|default:"Non renseignee" }}
+                        </dd>
+                    </div>
+                </dl>
+                {% if profil.photo %}
+                    <img class="fiche-inscription-photo"
+                         src="{{ profil.photo.url }}"
+                         alt="Photo de l'etudiant">
+                {% elif inscription.etudiant.photo_profil %}
+                    <img class="fiche-inscription-photo"
+                         src="{{ inscription.etudiant.photo_profil.url }}"
+                         alt="Photo de l'etudiant">
+                {% else %}
+                    <div class="fiche-inscription-photo-absence">Photo non disponible</div>
+                {% endif %}
+            </section>
+            <section class="fiche-inscription-section">
+                <h2>Inscription et admissibilite</h2>
+                <dl class="fiche-inscription-donnees">
+                    <div>
+                        <dt>Entite</dt>
+                        <dd>
+                            {{ inscription.programme.entite.nom }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Programme</dt>
+                        <dd>
+                            {{ inscription.programme.nom }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Periode</dt>
+                        <dd>
+                            {{ inscription.periode.nom }} · {{ inscription.periode.annee_academique }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Statut</dt>
+                        <dd>
+                            {{ inscription.get_statut_display }}
+                        </dd>
+                    </div>
+                    <div><dt>Conditions de passage</dt><dd>{% if inscription.conditions_passage_verifiees %}Verifiees par le Registrariat{% else %}Non verifiees{% endif %}</dd></div>
+                    <div>
+                        <dt>Frais de scolarite</dt>
+                        <dd>
+                            {{ total_confirme }} {{ tarif.devise }} / {{ tarif.montant }} {{ tarif.devise }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Date de validation</dt>
+                        <dd>
+                            {{ inscription.date_validation|date:"d/m/Y"|default:"-" }}
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Validee par</dt>
+                        <dd>
+                            {{ inscription.traite_par.get_full_name|default:inscription.traite_par.username|default:"-" }}
+                        </dd>
+                    </div>
+                </dl>
+            </section>
+            <section class="fiche-inscription-section">
+                <h2>Cours choisis pour cette periode</h2>
+                {% if selections %}
+                    <table class="fiche-inscription-cours">
+                        <thead>
+                            <tr>
+                                <th>Code</th>
+                                <th>Cours</th>
+                                <th>Type</th>
+                                <th>Credits</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for selection in selections %}
+                                <tr><td>{{ selection.cours.code }}</td><td>{{ selection.cours.nom }}</td><td>{% if selection.cours.est_obligatoire %}Obligatoire{% else %}Optionnel{% endif %}</td><td>{{ selection.cours.credits }}</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p>Aucun cours n'a encore ete selectionne pour cette inscription.</p>
+                {% endif %}
+            </section>
+            <footer class="fiche-inscription-signature">
+                <div>Signature de l'etudiant</div>
+                <div>Pour le Registrariat · Signature et sceau</div>
+            </footer>
+        </article>
+        <div class="fiche-inscription-actions">
+            <a class="bouton-secondaire"
+               href="{% url 'inscriptions:inscription_etudiant' %}">Retour</a>
+            <button class="bouton-principal"
+                    type="button"
+                    onclick="window.print()">Imprimer la fiche <span aria-hidden="true">→</span></button>
+        </div>
+    </main>
+{% endblock %}
